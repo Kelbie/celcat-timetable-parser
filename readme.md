@@ -113,3 +113,19 @@ You have to download the PDF manually (for now).
 # Usage
 
 Put a PDF file in `/public` then alter the path in `/routes/pdf2txt.js`
+
+# Postgres
+
+## Staff
+
+    CREATE TABLE staff (
+      id SERIAL, 
+      first VARCHAR, 
+      last VARCHAR, 
+      raw VARCHAR, 
+      link VARCHAR UNIQUE, 
+      tag VARCHAR, 
+      PRIMARY KEY (id)
+    );
+
+## 
