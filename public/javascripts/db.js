@@ -5,9 +5,7 @@ const client = new Client({
 
 client.connect()
 
-async function addStaff (args) {
-  // Add staff member if not exists
-
+async function add(args, table) {
   var keys = Object.keys(args).join(",");
   var values = Object.values(args);
   var params = values.map((value, i) => {
@@ -15,10 +13,33 @@ async function addStaff (args) {
   })
 
   await client.query(`
-    INSERT INTO staff (${keys})
+    INSERT INTO ${table} (${keys})
       VALUES (${params.join(",")})
         ON CONFLICT (link) DO NOTHING;
   `, [...values])
 }
 
-module.exports.addStaff = addStaff;
+async function addStaff(args) {
+  // Add staff member if not exists
+  await add(args, "staff")
+}
+
+async function addModule(args) {
+  // Add module if not exists
+  await add(args)
+}
+
+async function addRoom(args) {
+  await add(args, "rooms")
+}
+
+async function addGroup(args) {
+  await add(args)
+}
+
+module.exports = {
+  addStaff,
+  addModule,
+  addRoom,
+  addGroup
+};

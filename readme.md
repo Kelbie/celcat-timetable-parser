@@ -128,4 +128,14 @@ Put a PDF file in `/public` then alter the path in `/routes/pdf2txt.js`
       PRIMARY KEY (id)
     );
 
-## 
+## Room
+
+    CREATE TABLE rooms (
+      id SERIAL,
+      identifier VARCHAR,
+      raw VARCHAR,
+      name VARCHAR,
+      building VARCHAR,
+      link VARCHAR UNIQUE,
+      PRIMARY KEY (id)
+    );

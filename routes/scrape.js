@@ -94,6 +94,7 @@ async function download() {
             }
             db.addStaff(staff)
           } else if (text.substring(0,4) == "Room") {
+            var room = {};
             var raw = text.split("Room:  ")[1]
             if (raw.includes("(") && raw.includes(")")) {
               var name = raw.match(/\(.+\)/g);
@@ -112,12 +113,24 @@ async function download() {
                 raw: raw,
                 link: link
               })
+              room = {
+                identifier: id.replace(/^\s+|\s+$/g, ''),
+                name: name,
+                building: building,
+                raw: raw,
+                link: link
+              }
             } else {
               data.rooms.push({
                 raw: raw,
                 link: link
               })
+              room = {
+                raw: raw,
+                link: link
+              }
             }
+            db.addRoom(room);
           } else if (text.substring(0,6) == "Module") {
             var raw = text.split("Module:  ")[1];
             var [id, name] = raw.split(",");
