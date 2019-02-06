@@ -37,7 +37,6 @@ function removeWhitespace(str) {
 async function test() {
   const txt = await pdf2txt.transform();
   const data = await scrape.all();
-  console.log(data.groups);
   pair(txt, data);
 }
 
@@ -83,7 +82,7 @@ function raw2dict(class_object, data) {
   }
   
   for (let j = 0; j < data.groups.length; j++) {
-    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].split(",")[1]))) {
+    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].raw.split(",")[1]))) {
       class_object["group"] = data.groups[j];
     }
   }

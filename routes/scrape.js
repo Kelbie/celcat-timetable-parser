@@ -38,11 +38,14 @@ async function download() {
       const tds = cheerio(body).find('td');
       for (let i = 0; i < tds.length; i++) {
         const td = tds[i];
-        const link = td.children.href;
         if (td.children[0].children != undefined) {
+          var link = td.children[0].children[0].parent.attribs.href;
           const text = td.children[0].children[0].data;
           if (text.substring(0,5) == "Group") {
-            data.groups.push(text.split("Group:  ")[1])
+            data.groups.push({
+              raw: text.split("Group:  ")[1],
+              link: link 
+            })
           } else if (text.substring(0,5) == "Staff") {
             var raw = text.split("Staff:  ")[1];
             if (raw.includes(",")) {
@@ -50,7 +53,8 @@ async function download() {
               data.staff.push({
                 first: first.replace(/^\s+|\s+$/g, ''),
                 last: last,
-                raw: raw
+                raw: raw,
+                link: link
               })
             } else if (raw.includes("(") && raw.includes(")")) {
               const tag = raw.match(/\(.+\)/g);
@@ -58,11 +62,13 @@ async function download() {
                 tag: tag[0],
                 first: first,
                 last: last,
-                raw: raw
+                raw: raw,
+                link: link
               })
             } else {
               data.staff.push({
-                raw: raw
+                raw: raw,
+                link: link
               })
             }
             
@@ -82,11 +88,13 @@ async function download() {
                 id: id.replace(/^\s+|\s+$/g, ''),
                 name: name,
                 building: building,
-                raw: raw
+                raw: raw,
+                link: link
               })
             } else {
               data.rooms.push({
-                raw: raw
+                raw: raw,
+                link: link
               })
             }
           } else if (text.substring(0,6) == "Module") {
@@ -96,7 +104,8 @@ async function download() {
             data.modules.push({
               id: id.replace(/^\s+|\s+$/g, ''),
               name: name,
-              raw: raw
+              raw: raw,
+              link: link
             })
           }
         }
