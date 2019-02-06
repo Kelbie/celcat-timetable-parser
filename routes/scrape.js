@@ -1,6 +1,7 @@
 var request = require("request-promise");
 var async = require("async");
 var cheerio = require("cheerio");
+var fs = require("fs");
 
 async function download() {
   var headers = {
@@ -16,9 +17,9 @@ async function download() {
     TE: "Trailers"
     // 'Cookie': 'mp_96b84420a1a32e448f73e7b9ffccebdb_mixpanel=%7B%22distinct_id%22%3A%20%22167e21a4445114-0677243f7fbef88-4a566b-13c680-167e21a4446371%22%2C%22%24initial_referrer%22%3A%20%22%24direct%22%2C%22%24initial_referring_domain%22%3A%20%22%24direct%22%7D; mp_a37bac8664a332481726ae49603f9f63_mixpanel=%7B%22distinct_id%22%3A%20%227a4df678-1858-477f-961d-741c201ec6b1%22%7D; .AspNetCore.Antiforgery.9TtSrW0hzOs=CfDJ8CbxocSCAUFFlXYrlS_uZQkvzgA84P4bix4l1zFSyVWGPukMjtR8G6TxyzWiw3o-2b_XhvkDrANbCXIGL3UasEde-VhiJnMRlvme-B3zsfO7r2eH3UMI70P8jHAYFoN6bdm-qnmjdQIy4chv5t5UaNE'
   };
-  
+
   var options = {
-    url: "http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/finder2.html",
+    url: JSON.parse(fs.readFileSync("public/json/config.json")).source,
     headers: headers,
     transform: function(body) {
       const data = {
