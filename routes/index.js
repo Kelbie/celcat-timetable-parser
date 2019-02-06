@@ -3,6 +3,11 @@ var pdf2json = require("pdf2json");
 var async = require("async");
 var router = express.Router();
 
+const { Client } = require('pg')
+const client = new Client()
+
+client.connect()
+
 const types = [
   "Event- Board",
   "Event- External",

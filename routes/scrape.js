@@ -3,6 +3,8 @@ var async = require("async");
 var cheerio = require("cheerio");
 var fs = require("fs");
 
+var db = require("../public/javascripts/db.js");
+
 async function download() {
   var headers = {
     "User-Agent":
@@ -49,6 +51,7 @@ async function download() {
             })
           } else if (text.substring(0,5) == "Staff") {
             var raw = text.split("Staff:  ")[1];
+            var staff = {};
             if (raw.includes(",")) {
               var [last, first] = raw.split(",");
               data.staff.push({
@@ -57,6 +60,12 @@ async function download() {
                 raw: raw,
                 link: link
               })
+              staff = {
+                first: first.replace(/^\s+|\s+$/g, ''),
+                last: last,
+                raw: raw,
+                link: link
+              }
             } else if (raw.includes("(") && raw.includes(")")) {
               const tag = raw.match(/\(.+\)/g);
               data.staff.push({
@@ -66,13 +75,24 @@ async function download() {
                 raw: raw,
                 link: link
               })
+              staff = {
+                tag: tag[0],
+                first: first,
+                last: last,
+                raw: raw,
+                link: link
+              }
             } else {
               data.staff.push({
                 raw: raw,
                 link: link
               })
+              staff = {
+                raw: raw,
+                link: link
+              }
             }
-            
+            db.addStaff(staff)
           } else if (text.substring(0,4) == "Room") {
             var raw = text.split("Room:  ")[1]
             if (raw.includes("(") && raw.includes(")")) {
