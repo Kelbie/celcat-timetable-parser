@@ -36,6 +36,7 @@ function removeWhitespace(str) {
 }
 
 async function test() {
+  await db.init();
   const txt = await pdf2txt.transform();
   await scrape.all();
   const data = {
