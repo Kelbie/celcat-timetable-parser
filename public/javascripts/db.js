@@ -19,6 +19,14 @@ async function add(args, table) {
   `, [...values])
 }
 
+async function get(table) {
+  const response =  await client.query(`
+    SELECT * FROM ${table};
+  `, []);
+
+  return response.rows;
+}
+
 async function addStaff(args) {
   // Add staff member if not exists
   await add(args, "staff")
@@ -38,9 +46,38 @@ async function addGroup(args) {
   await add(args, "groups")
 }
 
+async function addClass(args) {
+  await client.query(`
+    INSERT INTO class (
+      raw, module_id, group_id
+    ) VALUES ($1, $2, $3);
+  `, [args.raw, args.module_id, args.group_id]);
+}
+
+async function getGroups() {
+  return await get("groups")
+}
+
+async function getStaff() {
+  return await get("staff")
+}
+
+async function getModules() {
+  return await get("modules")
+}
+
+async function getRooms() {
+  return await get("rooms")
+}
+
 module.exports = {
   addStaff,
   addModule,
   addRoom,
-  addGroup
+  addGroup,
+  addClass,
+  getGroups,
+  getModules,
+  getRooms,
+  getStaff
 };

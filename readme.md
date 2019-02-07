@@ -161,3 +161,19 @@ Put a PDF file in `/public` then alter the path in `/routes/pdf2txt.js`
       raw VARCHAR,
       PRIMARY KEY (id)
     );
+
+## Class
+
+`start` could probably be considered unique if it a unix timestamp of the time the class starts since I don't think multiple classes can start simultaneously.
+
+    CREATE TABLE class (
+      id SERIAL,
+      raw VARCHAR,
+      group_id INT,
+      module_id INT,
+      start BIGINT UNIQUE,
+      end BIGINT
+      PRIMARY KEY (id)
+    );
+
+    );

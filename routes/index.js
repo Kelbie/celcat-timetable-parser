@@ -3,11 +3,6 @@ var pdf2json = require("pdf2json");
 var async = require("async");
 var router = express.Router();
 
-const { Client } = require('pg')
-const client = new Client()
-
-client.connect()
-
 const types = [
   "Event- Board",
   "Event- External",
@@ -33,6 +28,7 @@ const types = [
 
 var scrape = require("./scrape");
 var pdf2txt = require("./pdf2txt");
+var db = require("../public/javascripts/db");
 
 function removeWhitespace(str) {
   // Removes all whitespace and newline characters
@@ -41,7 +37,13 @@ function removeWhitespace(str) {
 
 async function test() {
   const txt = await pdf2txt.transform();
-  const data = await scrape.all();
+  await scrape.all();
+  const data = {
+    modules: await db.getModules(),
+    staff: await db.getStaff(),
+    groups: await db.getGroups(),
+    rooms: await db.getRooms()
+  }
   pair(txt, data);
 }
 
@@ -93,7 +95,7 @@ function raw2dict(class_object, data) {
   }
   
   for (let j = 0; j < data.modules.length; j++) {
-    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(`${data.modules[j].id} (${data.modules[j].name})`))) {
+    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(`${data.modules[j].id}`))) {
       class_object["module"] = data.modules[j];
     }
   }
@@ -101,7 +103,7 @@ function raw2dict(class_object, data) {
   return class_object;
 }
 
-function pair(txt, data) {
+async function pair(txt, data) {
   const txt_list = txt.split("\r");
   var classes = [];
   [class_object, group_reset] = reset({}, 0, 0);
@@ -111,9 +113,13 @@ function pair(txt, data) {
     
     if (contains(element, [types[10]])) {
       if (contains(class_object.raw, [types[10]])) {
-        console.log(group_by_day)
         class_object = raw2dict(class_object, data);
         group_by_day["classes"].push(class_object)
+        await db.addClass({
+          raw: class_object.raw,
+          group_id: class_object.group.id,
+          module_id: class_object.module.id
+        });
       }
 
       [class_object, group_reset] = reset(
@@ -171,6 +177,11 @@ function pair(txt, data) {
         if (class_object.raw != "" && class_object.raw.includes(types[10])) {
           class_object = raw2dict(class_object, data)
           group_by_day.classes.push(class_object);
+          await db.addClass({
+            raw: class_object.raw,
+            group_id: class_object.group.id,
+            module_id: class_object.module.id
+          });
         }
         classes.push(group_by_day);
         group_by_day = { classes: [] };
