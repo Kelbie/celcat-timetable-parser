@@ -59,6 +59,10 @@ async function addClassRooms(rooms, class_id) {
   await addClassX("class_rooms", "room_id", rooms, class_id)
 }
 
+async function addClassStaff(staff, class_id) {
+  await addClassX("class_staff", "staff_id", staff, class_id)
+}
+
 async function addClass(args) {
   var class_ = await client.query(`
     INSERT INTO class (
@@ -71,6 +75,9 @@ async function addClass(args) {
 
   if (args.rooms) {
     await addClassRooms(args.rooms, class_.id);
+  }
+  if (args.staff) {
+    await addClassStaff(args.staff, class_.id);
   }
 }
 
