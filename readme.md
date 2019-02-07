@@ -193,3 +193,12 @@ Many to many for `staff` and `rooms` since a staff member can have many classes 
       class_id INT,
       PRIMARY KEY (room_id, class_id)
     )
+
+# Queries
+
+1. Get week of classes
+
+    The string in this example is the day you wish to start from. 
+
+        SELECT * from class 
+          WHERE date < date '2019-02-04' + 7;
