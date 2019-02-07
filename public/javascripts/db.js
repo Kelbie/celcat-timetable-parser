@@ -5,6 +5,86 @@ const client = new Client({
 
 client.connect()
 
+async function init() {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS staff (
+      id SERIAL, 
+      first VARCHAR, 
+      last VARCHAR, 
+      raw VARCHAR, 
+      link VARCHAR UNIQUE, 
+      tag VARCHAR, 
+      PRIMARY KEY (id)
+    );
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS rooms (
+      id SERIAL,
+      identifier VARCHAR,
+      raw VARCHAR,
+      name VARCHAR,
+      building VARCHAR,
+      link VARCHAR UNIQUE,
+      PRIMARY KEY (id)
+    );
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS modules (
+      id SERIAL, 
+      identifier VARCHAR, 
+      raw VARCHAR, 
+      name VARCHAR, 
+      link VARCHAR UNIQUE, 
+      PRIMARY KEY(id)
+    );
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS groups (
+      id SERIAL,
+      identifier VARCHAR,
+      name VARCHAR,
+      link VARCHAR UNIQUE,
+      raw VARCHAR,
+      PRIMARY KEY (id)
+    );
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS class (
+      id SERIAL,
+      raw VARCHAR,
+      group_id INT,
+      module_id INT,
+      start VARCHAR,
+      finish VARCHAR,
+      date VARCHAR,
+      PRIMARY KEY (id),
+      UNIQUE (date, start)
+    );
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS class_staff (
+      staff_id INT,
+      class_id INT,
+      PRIMARY KEY (staff_id, class_id),
+      UNIQUE (staff_id, class_id)
+    );
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS class_rooms (
+      room_id INT,
+      class_id INT,
+      PRIMARY KEY (room_id, class_id),
+      UNIQUE (room_id, class_id)
+    )
+  `, []);
+}
+
 async function add(args, table) {
   var keys = Object.keys(args).join(",");
   var values = Object.values(args);
@@ -98,6 +178,7 @@ async function getRooms() {
 }
 
 module.exports = {
+  init,
   addStaff,
   addModule,
   addRoom,
