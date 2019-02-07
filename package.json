@@ -17,6 +17,6 @@
     "pdf2json": "^1.1.8",
     "pg": "^7.8.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
   }
 }
