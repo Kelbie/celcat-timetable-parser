@@ -24,20 +24,6 @@ async function download() {
     url: JSON.parse(fs.readFileSync("public/json/config.json")).source,
     headers: headers,
     transform: function(body) {
-      const data = {
-        staff: [
-
-        ],
-        rooms: [
-
-        ],
-        groups: [
-
-        ],
-        modules: [
-
-        ]
-      }
       const tds = cheerio(body).find('td');
       for (let i = 0; i < tds.length; i++) {
         const td = tds[i];
@@ -47,12 +33,6 @@ async function download() {
           const text = td.children[0].children[0].data;
           if (text.substring(0,5) == "Group") {
             const [name, identifier] = text.split("Group:  ")[1].split(",");
-            data.groups.push({
-              name: name,
-              identifier: identifier,
-              raw: text.split("Group:  ")[1],
-              link: link 
-            })
             group = {
               name: name,
               identifier: identifier,
@@ -65,12 +45,6 @@ async function download() {
             var staff = {};
             if (raw.includes(",")) {
               var [last, first] = raw.split(",");
-              data.staff.push({
-                first: first.replace(/^\s+|\s+$/g, ''),
-                last: last,
-                raw: raw,
-                link: link
-              })
               staff = {
                 first: first.replace(/^\s+|\s+$/g, ''),
                 last: last,
@@ -79,13 +53,6 @@ async function download() {
               }
             } else if (raw.includes("(") && raw.includes(")")) {
               const tag = raw.match(/\(.+\)/g);
-              data.staff.push({
-                tag: tag[0],
-                first: first,
-                last: last,
-                raw: raw,
-                link: link
-              })
               staff = {
                 tag: tag[0],
                 first: first,
@@ -94,10 +61,6 @@ async function download() {
                 link: link
               }
             } else {
-              data.staff.push({
-                raw: raw,
-                link: link
-              })
               staff = {
                 raw: raw,
                 link: link
@@ -117,13 +80,6 @@ async function download() {
                 name = name[0];
                 var id = raw.split(name)[0];
               }
-              data.rooms.push({
-                id: id.replace(/^\s+|\s+$/g, ''),
-                name: name,
-                building: building,
-                raw: raw,
-                link: link
-              })
               room = {
                 identifier: id.replace(/^\s+|\s+$/g, ''),
                 name: name,
@@ -132,10 +88,6 @@ async function download() {
                 link: link
               }
             } else {
-              data.rooms.push({
-                raw: raw,
-                link: link
-              })
               room = {
                 raw: raw,
                 link: link
@@ -147,12 +99,6 @@ async function download() {
             var raw = text.split("Module:  ")[1];
             var [id, name] = raw.split(",");
             name = name.replace(/^\s+|\s+$/g, '');
-            data.modules.push({
-              id: id.replace(/^\s+|\s+$/g, ''),
-              name: name,
-              raw: raw,
-              link: link
-            })
             module = {
               identifier: id.replace(/^\s+|\s+$/g, ''),
               name: name,
@@ -163,7 +109,6 @@ async function download() {
           }
         }
       }
-      return data;
     }
   };
   
