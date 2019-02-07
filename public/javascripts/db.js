@@ -26,7 +26,7 @@ async function addStaff(args) {
 
 async function addModule(args) {
   // Add module if not exists
-  await add(args)
+  await add(args, "modules")
 }
 
 async function addRoom(args) {
@@ -34,7 +34,8 @@ async function addRoom(args) {
 }
 
 async function addGroup(args) {
-  await add(args)
+  console.log(args);
+  await add(args, "groups")
 }
 
 module.exports = {

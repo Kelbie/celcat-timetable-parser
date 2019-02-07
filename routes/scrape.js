@@ -42,13 +42,24 @@ async function download() {
       for (let i = 0; i < tds.length; i++) {
         const td = tds[i];
         if (td.children[0].children != undefined) {
+          var groups = {};
           var link = td.children[0].children[0].parent.attribs.href;
           const text = td.children[0].children[0].data;
           if (text.substring(0,5) == "Group") {
+            const [name, identifier] = text.split("Group:  ")[1].split(",");
             data.groups.push({
+              name: name,
+              identifier: identifier,
               raw: text.split("Group:  ")[1],
               link: link 
             })
+            group = {
+              name: name,
+              identifier: identifier,
+              raw: text.split("Group:  ")[1],
+              link: link 
+            }
+            db.addGroup(group)
           } else if (text.substring(0,5) == "Staff") {
             var raw = text.split("Staff:  ")[1];
             var staff = {};
@@ -132,6 +143,7 @@ async function download() {
             }
             db.addRoom(room);
           } else if (text.substring(0,6) == "Module") {
+            var module = {};
             var raw = text.split("Module:  ")[1];
             var [id, name] = raw.split(",");
             name = name.replace(/^\s+|\s+$/g, '');
@@ -141,6 +153,13 @@ async function download() {
               raw: raw,
               link: link
             })
+            module = {
+              identifier: id.replace(/^\s+|\s+$/g, ''),
+              name: name,
+              raw: raw,
+              link: link
+            }
+            db.addModule(module)
           }
         }
       }
