@@ -115,13 +115,6 @@ async function pair(txt, data) {
       if (contains(class_object.raw, [types[10]])) {
         class_object = raw2dict(class_object, data);
         group_by_day["classes"].push(class_object)
-        await db.addClass({
-          raw: class_object.raw,
-          group_id: class_object.group.id,
-          module_id: class_object.module.id
-          staff: class_object.staff.map(staff => {return staff.id}),
-          rooms: class_object.rooms.map(room => {return room.id})
-        });
       }
 
       [class_object, group_reset] = reset(
@@ -133,19 +126,19 @@ async function pair(txt, data) {
     }
 
     if (i - 10 < group_reset) {
-      // if (contains(element, [types[10]])) {
-      //   // If any standard (expected) type
-      //   var [type, time] = element.split(",");
-      //   time = time.replace(/^\s+|\s+$/g, "");
-      //   var [start, end] = time.split("-");
+      if (contains(element, [types[10]])) {
+        // If any standard (expected) type
+        var [type, time] = element.split(",");
+        time = time.match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
+        time = time.replace(/^\s+|\s+$/g, "");
+        var [start, end] = time.split("-");
 
-      //   class_object["line"] = i;
-      //   class_object["type"] = type.split("\n")[1];
-      //   class_object["time"] = {
-      //     start: start,
-      //     end: end
-      //   };
-      // }
+        // class_object["type"] = type.split("\n")[1];
+        class_object["time"] = {
+          start: start,
+          end: end
+        };
+      }
 
       class_object["raw"] += element;
     }
@@ -179,12 +172,22 @@ async function pair(txt, data) {
         if (class_object.raw != "" && class_object.raw.includes(types[10])) {
           class_object = raw2dict(class_object, data)
           group_by_day.classes.push(class_object);
-          await db.addClass({
-            raw: class_object.raw,
-            group_id: class_object.group.id,
-            module_id: class_object.module.id
-          });
         }
+
+        for (let k = 0; k < group_by_day.classes.length; k++) {
+          const class_ = group_by_day.classes[k];
+          await db.addClass({
+            raw: class_.raw,
+            group_id: class_.group.id,
+            module_id: class_.module.id,
+            date: date[0],
+            start: class_.time.start,
+            finish: class_.time.end,
+            staff: class_.staff.map(staff => {return staff.id}),
+            rooms: class_.rooms.map(room => {return room.id})
+          }); 
+        }
+
         classes.push(group_by_day);
         group_by_day = { classes: [] };
         [class_object, group_reset] = reset(

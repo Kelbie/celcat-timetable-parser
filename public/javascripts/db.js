@@ -130,7 +130,8 @@ async function addClassX(table, type_id, arr, class_id) {
     await client.query(`
       INSERT INTO ${table} (
         ${type_id}, class_id
-      ) VALUES ($1, $2);
+      ) VALUES ($1, $2)
+          ON CONFLICT (${type_id}, class_id) DO NOTHING;
     `, [x_id, class_id])
   });
 }
@@ -146,10 +147,10 @@ async function addClassStaff(staff, class_id) {
 async function addClass(args) {
   var class_ = await client.query(`
     INSERT INTO class (
-      raw, module_id, group_id
-    ) VALUES ($1, $2, $3)
+      raw, module_id, group_id, start, finish, date
+    ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id;
-  `, [args.raw, args.module_id, args.group_id]);
+  `, [args.raw, args.module_id, args.group_id, args.start, args.finish, args.date]);
   
   class_ = class_.rows[0]
 

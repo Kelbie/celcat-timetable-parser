@@ -176,7 +176,7 @@ Put a PDF file in `/public` then alter the path in `/routes/pdf2txt.js`
       PRIMARY KEY (id)
     );
 
-Many to many for `staff` and `groups` since a staff member can have many classes and a class can have many staff members. The same applies for groups.
+Many to many for `staff` and `rooms` since a staff member can have many classes and a class can have many staff members. The same applies for rooms.
 
 ## Class_Staff
 
@@ -185,6 +185,7 @@ Many to many for `staff` and `groups` since a staff member can have many classes
       class_id INT,
       PRIMARY KEY (staff_id, class_id)
     );
+
 ## Class_Rooms
 
     CREATE TABLE class_rooms (
