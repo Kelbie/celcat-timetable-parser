@@ -176,4 +176,10 @@ Put a PDF file in `/public` then alter the path in `/routes/pdf2txt.js`
       PRIMARY KEY (id)
     );
 
-    );
+    );## Class_Rooms
+
+    CREATE TABLE class_rooms (
+      room_id INT,
+      class_id INT,
+      PRIMARY KEY (room_id, class_id)
+    )

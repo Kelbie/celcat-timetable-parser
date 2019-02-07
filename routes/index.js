@@ -119,6 +119,7 @@ async function pair(txt, data) {
           raw: class_object.raw,
           group_id: class_object.group.id,
           module_id: class_object.module.id
+          rooms: class_object.rooms.map(room => {return room.id})
         });
       }
 

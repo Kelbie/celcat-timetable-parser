@@ -47,11 +47,25 @@ async function addGroup(args) {
 }
 
 async function addClass(args) {
-  await client.query(`
+  var class_ = await client.query(`
     INSERT INTO class (
       raw, module_id, group_id
-    ) VALUES ($1, $2, $3);
+    ) VALUES ($1, $2, $3)
+      RETURNING id;
   `, [args.raw, args.module_id, args.group_id]);
+  
+  class_ = class_.rows[0]
+  console.log(args.rooms);
+  if (args.rooms) {
+    args.rooms.forEach(async (room_id) => {
+      console.log(class_.id, await room_id)
+      await client.query(`
+        INSERT INTO class_rooms (
+          room_id, class_id
+        ) VALUES ($1, $2);
+      `, [room_id, class_.id])
+    });
+  }
 }
 
 async function getGroups() {
