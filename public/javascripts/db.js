@@ -42,8 +42,21 @@ async function addRoom(args) {
 }
 
 async function addGroup(args) {
-  console.log(args);
   await add(args, "groups")
+}
+
+async function addClassX(table, type_id, arr, class_id) {
+  await arr.forEach(async (x_id) => {
+    await client.query(`
+      INSERT INTO ${table} (
+        ${type_id}, class_id
+      ) VALUES ($1, $2);
+    `, [x_id, class_id])
+  });
+}
+
+async function addClassRooms(rooms, class_id) {
+  await addClassX("class_rooms", "room_id", rooms, class_id)
 }
 
 async function addClass(args) {
@@ -55,16 +68,9 @@ async function addClass(args) {
   `, [args.raw, args.module_id, args.group_id]);
   
   class_ = class_.rows[0]
-  console.log(args.rooms);
+
   if (args.rooms) {
-    args.rooms.forEach(async (room_id) => {
-      console.log(class_.id, await room_id)
-      await client.query(`
-        INSERT INTO class_rooms (
-          room_id, class_id
-        ) VALUES ($1, $2);
-      `, [room_id, class_.id])
-    });
+    await addClassRooms(args.rooms, class_.id);
   }
 }
 
