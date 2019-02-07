@@ -142,22 +142,22 @@ Put a PDF file in `/public` then alter the path in `/routes/pdf2txt.js`
 
 ## Modules
 
-  CREATE TABLE modules (
-    id SERIAL, 
-    identifier VARCHAR, 
-    raw VARCHAR, 
-    name VARCHAR, 
-    link VARCHAR UNIQUE, 
-    PRIMARY KEY(id)
-  );
+    CREATE TABLE modules (
+      id SERIAL, 
+      identifier VARCHAR, 
+      raw VARCHAR, 
+      name VARCHAR, 
+      link VARCHAR UNIQUE, 
+      PRIMARY KEY(id)
+    );
 
 ## Groups
 
-  CREATE TABLE groups (
-    id SERIAL,
-    identifier VARCHAR,
-    name VARCHAR,
-    link VARCHAR UNIQUE,
-    raw VARCHAR,
-    PRIMARY KEY (id)
-  );
+    CREATE TABLE groups (
+      id SERIAL,
+      identifier VARCHAR,
+      name VARCHAR,
+      link VARCHAR UNIQUE,
+      raw VARCHAR,
+      PRIMARY KEY (id)
+    );
