@@ -45,6 +45,7 @@ async function test() {
     groups: await db.getGroups(),
     rooms: await db.getRooms()
   }
+  console.log(data.modules);
   pair(txt, data);
 }
 
@@ -165,9 +166,11 @@ async function pair(txt, data) {
           day = "Sunday"
         } 
   
-        const date = element.match(/[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g);
-  
-        group_by_day["date"] = date[0];
+        var date = element.match(/[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g)[0].split("/");
+        date = `${date[2]}-${date[1]}-${date[0]}`
+
+
+        group_by_day["date"] = date;
         group_by_day["day"] = day;
   
         if (class_object.raw != "" && class_object.raw.includes(types[10])) {
@@ -181,7 +184,7 @@ async function pair(txt, data) {
             raw: class_.raw,
             group_id: class_.group.id,
             module_id: class_.module.id,
-            date: date[0],
+            date: date,
             start: class_.time.start,
             finish: class_.time.end,
             staff: class_.staff.map(staff => {return staff.id}),

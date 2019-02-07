@@ -13,8 +13,8 @@ module.exports = {
       );
 
       pdfParser.on("pdfParser_dataReady", pdfData => {
+        fs.writeFile("public/r102826.txt", pdfParser.getRawTextContent());
         resolve(pdfParser.getRawTextContent());
-        // fs.writeFile("public/r102826.txt", pdfParser.getRawTextContent());
       });
 
       pdfParser.loadPDF("public/r102826.pdf");

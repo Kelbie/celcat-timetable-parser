@@ -1,7 +1,7 @@
 const  async = require("async");
 const { Client } = require('pg')
-const client = new Client({
-})
+  const client = new Client({
+  })
 
 client.connect()
 
@@ -60,7 +60,7 @@ async function init() {
       module_id INT,
       start VARCHAR,
       finish VARCHAR,
-      date VARCHAR,
+      date DATE,
       PRIMARY KEY (id),
       UNIQUE (date, start)
     );
@@ -149,9 +149,7 @@ async function addClass(args) {
     INSERT INTO class (
       raw, module_id, group_id, start, finish, date
     ) VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (start, date) DO UPDATE 
-          SET id = class.id
-            RETURNING id
+      RETURNING id
   `, [args.raw, args.module_id, args.group_id, args.start, args.finish, args.date]);
   
   class_ = class_.rows[0]
