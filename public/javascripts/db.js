@@ -216,6 +216,7 @@ async function getClasses(group_id) {
         WHERE id=$1
     `, [class_.module_id])
     classes.rows[i].module = module.rows[0];
+    delete classes.rows[i].module_id;
 
     // Get class rooms
     var class_rooms = await client.query(`
