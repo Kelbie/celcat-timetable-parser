@@ -56,13 +56,12 @@ async function init() {
     CREATE TABLE IF NOT EXISTS class (
       id SERIAL,
       raw VARCHAR,
-      group_id INT,
       module_id INT,
       start VARCHAR,
       finish VARCHAR,
       date DATE,
       PRIMARY KEY (id),
-      UNIQUE (date, start)
+      UNIQUE (date, start, module_id)
     );
   `, []);
 
@@ -81,6 +80,15 @@ async function init() {
       class_id INT,
       PRIMARY KEY (room_id, class_id),
       UNIQUE (room_id, class_id)
+    )
+  `, []);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS class_groups (
+      group_id INT,
+      class_id INT,
+      PRIMARY KEY (group_id, class_id),
+      UNIQUE (group_id, class_id)
     )
   `, []);
 }
@@ -144,22 +152,35 @@ async function addClassStaff(staff, class_id) {
   await addClassX("class_staff", "staff_id", staff, class_id)
 }
 
+async function addClassGroups(groups, class_id) {
+  await addClassX("class_groups", "group_id", groups, class_id)
+}
+
 async function addClass(args) {
   var class_ = await client.query(`
     INSERT INTO class (
-      raw, module_id, group_id, start, finish, date
-    ) VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id
-  `, [args.raw, args.module_id, args.group_id, args.start, args.finish, args.date]);
+      raw, module_id, start, finish, date
+    ) VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (date, start, module_id) 
+        DO NOTHING
+          RETURNING id
+  `, [args.raw, args.module_id, args.start, args.finish, args.date]);
   
   class_ = class_.rows[0]
 
-  if (args.rooms) {
-    await addClassRooms(args.rooms, class_.id);
+  // If class_ is undefined then its already added
+  if (class_ != undefined) {
+    if (args.rooms) {
+      await addClassRooms(args.rooms, class_.id);
+    }
+    if (args.staff) {
+      await addClassStaff(args.staff, class_.id);
+    }
+    if (args.groups) {
+      await addClassGroups(args.groups, class_.id);
+    }
   }
-  if (args.staff) {
-    await addClassStaff(args.staff, class_.id);
-  }
+
 }
 
 async function getGroups() {

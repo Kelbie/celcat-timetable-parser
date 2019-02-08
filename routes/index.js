@@ -77,6 +77,7 @@ function reset(class_object, group_reset, i, push) {
 function raw2dict(class_object, data) {
   class_object["staff"] = [];
   class_object["rooms"] = [];
+  class_object["groups"] = [];
 
   for (let j = 0; j < data.staff.length; j++) {
     if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.staff[j].raw))) {
@@ -92,7 +93,7 @@ function raw2dict(class_object, data) {
   
   for (let j = 0; j < data.groups.length; j++) {
     if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].raw.split(",")[1]))) {
-      class_object["group"] = data.groups[j];
+      class_object["groups"].push(data.groups[j]);
     }
   }
   
@@ -182,13 +183,13 @@ async function pair(txt, data) {
           const class_ = group_by_day.classes[k];
           await db.addClass({
             raw: class_.raw,
-            group_id: class_.group.id,
             module_id: class_.module.id,
             date: date,
             start: class_.time.start,
             finish: class_.time.end,
             staff: class_.staff.map(staff => {return staff.id}),
-            rooms: class_.rooms.map(room => {return room.id})
+            rooms: class_.rooms.map(room => {return room.id}),
+            groups: class_.groups.map(group => {return group.id})
           }); 
         }
 
