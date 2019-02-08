@@ -233,4 +233,9 @@ router.get("/modules/:id", async (req, res, next) => {
   res.json(modules);
 });
 
+router.get("/classes/:group_id", async (req, res, next) => {
+  const classes = await db.getClasses(req.params.group_id);
+  res.json(classes);
+});
+
 module.exports = router;

@@ -230,3 +230,9 @@ GET /modules/:id
   "name": "ADVANCED ARTIFICIAL INTELLIGENCE - CM4107"
 }
 ```
+
+```
+GET /classes/:module_id
+
+
+```

@@ -194,6 +194,81 @@ async function addClass(args) {
 
 }
 
+async function getClasses(group_id) {
+
+  var classes = await client.query(`
+    SELECT id, start, finish, date, module_id FROM class
+      WHERE id = ANY(
+        SELECT class_id FROM class_groups
+          WHERE group_id=$1
+      )
+  `, [group_id]);
+
+  
+  for (let i = 0; i < classes.rows.length; i++) {
+    const class_ = classes.rows[i];
+    classes.rows[i].rooms = [];
+    classes.rows[i].groups = [];
+    classes.rows[i].staff = [];
+
+    var module = await client.query(`
+      SELECT id, identifier, name FROM modules
+        WHERE id=$1
+    `, [class_.module_id])
+    classes.rows[i].module = module.rows[0];
+
+    // Get class rooms
+    var class_rooms = await client.query(`
+      SELECT * FROM class_rooms
+        WHERE class_id=$1
+    `, [class_.id]);
+
+    for (let j = 0; j < class_rooms.rows.length; j++) {
+      const room_id = class_rooms.rows[j].room_id;
+      var room = await client.query(`
+        SELECT id, identifier, name FROM rooms
+          WHERE id=$1
+      `, [room_id]);
+
+      classes.rows[i].rooms.push(room.rows[0]);
+    }
+
+    // Get class groups
+    var class_groups = await client.query(`
+      SELECT * FROM class_groups
+        WHERE class_id=$1
+    `, [class_.id]);
+
+    for (let j = 0; j < class_groups.rows.length; j++) {
+      const group_id = class_groups.rows[j].group_id;
+      var group = await client.query(`
+        SELECT id, identifier, name FROM groups
+          WHERE id=$1
+      `, [group_id]);
+
+      classes.rows[i].groups.push(group.rows[0]);
+    }
+
+    // Get class staff
+    var class_staff = await client.query(`
+      SELECT * FROM class_staff
+        WHERE class_id=$1
+    `, [class_.id]);
+
+    for (let j = 0; j < class_staff.rows.length; j++) {
+      const staff_id = class_staff.rows[j].staff_id;
+      var staff = await client.query(`
+        SELECT id, first, last, tag FROM staff
+          WHERE id=$1
+      `, [staff_id]);
+
+      classes.rows[i].staff.push(staff.rows[0]);
+    }
+  }
+
+  return classes.rows;
+}
+
 async function getGroups() {
   return await get("groups")
 }
@@ -217,6 +292,7 @@ module.exports = {
   addRoom,
   addGroup,
   addClass,
+  getClasses,
   getGroups,
   getModules,
   getRooms,
