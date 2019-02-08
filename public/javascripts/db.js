@@ -107,9 +107,20 @@ async function add(args, table) {
   `, [...values])
 }
 
-async function get(table) {
+async function get(table, options) {
+  var select = "*";
+  var where = "TRUE"
+  if (options != undefined) {
+    if (options.select != undefined) {
+      select = options.select
+    }
+    if (options.where != undefined) {
+      where = options.where
+    }
+  }
   const response =  await client.query(`
-    SELECT * FROM ${table};
+    SELECT ${select} FROM ${table}
+      WHERE ${where};
   `, []);
 
   return response.rows;
@@ -191,8 +202,8 @@ async function getStaff() {
   return await get("staff")
 }
 
-async function getModules() {
-  return await get("modules")
+async function getModules(options) {
+  return await get("modules", options)
 }
 
 async function getRooms() {

@@ -45,7 +45,6 @@ async function test() {
     groups: await db.getGroups(),
     rooms: await db.getRooms()
   }
-  console.log(data.modules);
   pair(txt, data);
 }
 
@@ -222,6 +221,16 @@ async function pair(txt, data) {
 /* GET home page. */
 router.get("/", function(req, res, next) {
   res.render("index", { title: "Express" });
+});
+
+router.get("/modules", async (req, res, next) => {
+  const modules = await db.getModules({select: "id, identifier, name"});
+  res.json(modules);
+});
+
+router.get("/modules/:id", async (req, res, next) => {
+  const modules = await db.getModules({where: `id=${req.params.id}`, select: "id, identifier, name"});
+  res.json(modules);
 });
 
 module.exports = router;

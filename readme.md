@@ -202,3 +202,31 @@ Many to many for `staff` and `rooms` since a staff member can have many classes 
 
         SELECT * from class 
           WHERE date < date '2019-02-04' + 7;
+
+
+# Endpoints
+```
+GET /modules
+
+[
+  {
+    "id": 1,
+    "identifier": "AA1001",
+    "name": "DRAWING & VISUALISATION 1 - AA1001"
+  }, 
+  {
+    "id": 2,
+    "identifier": "AA1001-YEAR-A",
+    "name": "DRAWING & VISUALISATION 1"
+  }, ... ]
+```
+
+```
+GET /modules/:id
+
+{
+  "id": 2359,
+  "identifier": "CM4107",
+  "name": "ADVANCED ARTIFICIAL INTELLIGENCE - CM4107"
+}
+```
