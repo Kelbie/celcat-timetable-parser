@@ -90,17 +90,27 @@ function raw2dict(class_object, data) {
     }
   }
   
+  
+  for (let j = 0; j < data.modules.length; j++) {
+    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.modules[j].identifier))) {
+      class_object["module"] = data.modules[j];
+    }
+  }
+  
   for (let j = 0; j < data.groups.length; j++) {
     if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].raw.split(",")[1]))) {
       class_object["groups"].push(data.groups[j]);
     }
   }
-  
-  for (let j = 0; j < data.modules.length; j++) {
-    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(`${data.modules[j].id}`))) {
-      class_object["module"] = data.modules[j];
-    }
-  }
+
+  time = class_object.raw.match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
+  time = time.replace(/^\s+|\s+$/g, "");
+  var [start, end] = time.split("-");
+
+  class_object["time"] = {
+    start: start,
+    end: end
+  };
 
   return class_object;
 }
@@ -130,16 +140,7 @@ async function pair(txt, data) {
     if (i - 10 < group_reset) {
       if (contains(element, [types[10]])) {
         // If any standard (expected) type
-        var [type, time] = element.split(",");
-        time = time.match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
-        time = time.replace(/^\s+|\s+$/g, "");
-        var [start, end] = time.split("-");
-
-        // class_object["type"] = type.split("\n")[1];
-        class_object["time"] = {
-          start: start,
-          end: end
-        };
+        
       }
 
       class_object["raw"] += element;
@@ -207,7 +208,7 @@ async function pair(txt, data) {
   const fs = require("fs");
   fs.writeFile("public/test.json", JSON.stringify(classes), function(err) {
     if (err) {
-      return console.log(err);
+      return console.log(2, err);
     }
 
     console.log("The file was saved!");
