@@ -1,3 +1,4 @@
+const http = require('http');
 var request = require("request-promise");
 var async = require("async");
 var cheerio = require("cheerio");
@@ -117,8 +118,23 @@ async function download() {
   return await request(options);
 }
 
+async function sleep(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
+}
+
 module.exports = {
   all: async function() {
     return await download();
+  },
+  pdf: async function() {
+    const PDFs = await db.getPDFs();
+    for (let i = 16; i < PDFs.length; i++) {
+      var PDF = PDFs[i].link;
+      var file = fs.createWriteStream(`timetables/${PDF}`);
+      await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, function(response) {
+        response.pipe(file);
+      });
+      await sleep(120000);
+    }
   }
 }

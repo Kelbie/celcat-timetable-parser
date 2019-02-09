@@ -81,3 +81,4 @@ typings/
 package-lock.json
 
 timetables/*.pdf
+.DS_Store

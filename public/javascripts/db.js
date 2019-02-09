@@ -197,7 +197,7 @@ async function addClass(args) {
 async function getClasses(group_id) {
 
   var classes = await client.query(`
-    SELECT id, start, finish, date, module_id FROM class
+    SELECT id, start, finish, date, module_id, raw FROM class
       WHERE id = ANY(
         SELECT class_id FROM class_groups
           WHERE group_id=$1
@@ -286,6 +286,14 @@ async function getRooms() {
   return await get("rooms")
 }
 
+async function getPDFs() {
+  const PDFs = await client.query(`
+    SELECT link from groups
+  `, []);
+
+  return PDFs.rows
+}
+
 module.exports = {
   init,
   addStaff,
@@ -297,5 +305,6 @@ module.exports = {
   getGroups,
   getModules,
   getRooms,
-  getStaff
+  getStaff,
+  getPDFs
 };

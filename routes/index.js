@@ -1,6 +1,7 @@
 var express = require("express");
 var pdf2json = require("pdf2json");
 var async = require("async");
+var fs = require("fs");
 var router = express.Router();
 
 const types = [
@@ -37,15 +38,23 @@ function removeWhitespace(str) {
 
 async function test() {
   await db.init();
-  const txt = await pdf2txt.transform();
   await scrape.all();
-  const data = {
-    modules: await db.getModules(),
-    staff: await db.getStaff(),
-    groups: await db.getGroups(),
-    rooms: await db.getRooms()
-  }
-  pair(txt, data);
+  await scrape.pdf();
+  
+  fs.readdir("timetables", (err, files) => {
+    files.forEach(async (file) => {
+      const txt = await pdf2txt.transform(file);
+      const data = {
+        modules: await db.getModules(),
+        staff: await db.getStaff(),
+        groups: await db.getGroups(),
+        rooms: await db.getRooms()
+      }
+
+      await pair(txt, data);
+    });
+  })
+
 }
 
 test();
