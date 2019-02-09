@@ -168,14 +168,15 @@ async function addClassGroups(groups, class_id) {
 }
 
 async function addClass(args) {
+
   var class_ = await client.query(`
-    INSERT INTO class (
-      raw, module_id, start, finish, date
-    ) VALUES ($1, $2, $3, $4, $5)
-      ON CONFLICT (date, start, module_id) 
-        DO NOTHING
-          RETURNING id
-  `, [args.raw, args.module_id, args.start, args.finish, args.date]);
+      INSERT INTO class (
+        raw, module_id, start, finish, date
+      ) VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (module_id, start, date) DO NOTHING
+        RETURNING id;
+    `, [args.raw, args.module_id, args.start, args.finish, args.date]);
+
   
   class_ = class_.rows[0]
 
@@ -294,6 +295,38 @@ async function getPDFs() {
   return PDFs.rows
 }
 
+async function countX(table) {
+  const count = await client.query(`
+    SELECT count(*) FROM ${table}
+  `, []);
+
+  return count.rows[0]
+}
+
+async function countGroups() {
+  const count = await countX("groups");
+
+  return count;
+}
+
+async function countRooms() {
+  const count = await countX("rooms");
+
+  return count;
+}
+
+async function countModules() {
+  const count = await countX("modules");
+
+  return count;
+}
+
+async function countStaff() {
+  const count = await countX("staff");
+
+  return count;
+}
+
 module.exports = {
   init,
   addStaff,
@@ -306,5 +339,9 @@ module.exports = {
   getModules,
   getRooms,
   getStaff,
-  getPDFs
+  getPDFs,
+  countGroups,
+  countModules,
+  countRooms,
+  countStaff
 };

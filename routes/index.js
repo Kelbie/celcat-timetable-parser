@@ -39,7 +39,7 @@ function removeWhitespace(str) {
 async function test() {
   await db.init();
   await scrape.all();
-  await scrape.pdf();
+  // await scrape.pdf();
   
   fs.readdir("timetables", (err, files) => {
     files.forEach(async (file) => {
@@ -107,12 +107,12 @@ function raw2dict(class_object, data) {
   }
   
   for (let j = 0; j < data.groups.length; j++) {
-    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].raw.split(",")[1]))) {
+    if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].identifier))) {
       class_object["groups"].push(data.groups[j]);
     }
   }
 
-  time = class_object.raw.match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
+  time = removeWhitespace(class_object.raw).match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
   time = time.replace(/^\s+|\s+$/g, "");
   var [start, end] = time.split("-");
 
@@ -132,8 +132,8 @@ async function pair(txt, data) {
   for (let i = 0; i < txt_list.length; i++) {
     const element = txt_list[i];
     
-    if (contains(element, [types[10]])) {
-      if (contains(class_object.raw, [types[10]])) {
+    if (contains(removeWhitespace(element), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
+      if (contains(removeWhitespace(class_object.raw), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
         class_object = raw2dict(class_object, data);
         group_by_day["classes"].push(class_object)
       }
@@ -144,15 +144,6 @@ async function pair(txt, data) {
         i,
         true
       );
-    }
-
-    if (i - 10 < group_reset) {
-      if (contains(element, [types[10]])) {
-        // If any standard (expected) type
-        
-      }
-
-      class_object["raw"] += element;
     }
 
     if (contains(element, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])) {
@@ -183,23 +174,25 @@ async function pair(txt, data) {
         group_by_day["date"] = date;
         group_by_day["day"] = day;
   
-        if (class_object.raw != "" && class_object.raw.includes(types[10])) {
+        if (class_object.raw != "" && contains(removeWhitespace(class_object.raw), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
           class_object = raw2dict(class_object, data)
           group_by_day.classes.push(class_object);
         }
 
         for (let k = 0; k < group_by_day.classes.length; k++) {
           const class_ = group_by_day.classes[k];
-          await db.addClass({
-            raw: class_.raw,
-            module_id: class_.module.id,
-            date: date,
-            start: class_.time.start,
-            finish: class_.time.end,
-            staff: class_.staff.map(staff => {return staff.id}),
-            rooms: class_.rooms.map(room => {return room.id}),
-            groups: class_.groups.map(group => {return group.id})
-          }); 
+          if (class_.module != undefined) {
+            await db.addClass({
+              raw: class_.raw,
+              module_id: class_.module.id,
+              date: date,
+              start: class_.time.start,
+              finish: class_.time.end,
+              staff: class_.staff.map(staff => {return staff.id}),
+              rooms: class_.rooms.map(room => {return room.id}),
+              groups: class_.groups.map(group => {return group.id})
+            }); 
+          }
         }
 
         classes.push(group_by_day);
@@ -212,6 +205,11 @@ async function pair(txt, data) {
         );
       }
     }  
+
+    if (i - 10 < group_reset) {
+      class_object["raw"] += element;
+    }
+
   }
 
   const fs = require("fs");
@@ -246,6 +244,26 @@ router.get("/modules/:id", async (req, res, next) => {
 router.get("/classes/:group_id", async (req, res, next) => {
   const classes = await db.getClasses(req.params.group_id);
   res.json(classes);
+});
+
+router.get("/groups/count", async (req, res, next) => {
+  const count = db.countGroups();
+  res.json(count)
+});
+
+router.get("/staff/count", async (req, res, next) => {
+  const count = db.countStaff();
+  res.json(count)
+});
+
+router.get("/modules/count", async (req, res, next) => {
+  const count = db.countModules();
+  res.json(count)
+});
+
+router.get("/rooms/count", async (req, res, next) => {
+  const count = db.countRooms();
+  res.json(count)
 });
 
 module.exports = router;

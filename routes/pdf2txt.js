@@ -13,7 +13,7 @@ module.exports = {
       );
 
       pdfParser.on("pdfParser_dataReady", pdfData => {
-        // fs.writeFile(`timetables/${file}`, pdfParser.getRawTextContent());
+        // fs.writeFile(`${file}`, pdfParser.getRawTextContent());
         resolve(pdfParser.getRawTextContent());
       });
 
