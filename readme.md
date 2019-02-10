@@ -15,7 +15,8 @@ GET /classes/group/:group_id
       {
         "id": 62,
         "identifier": "H234",
-        "name": "(147 cap L/T)"
+        "name": "(147 cap L/T)",
+        "building": "IGB"
       }
     ],
     "groups": [

@@ -228,7 +228,7 @@ async function getClasses(group_id) {
     for (let j = 0; j < class_rooms.rows.length; j++) {
       const room_id = class_rooms.rows[j].room_id;
       var room = await client.query(`
-        SELECT id, identifier, name FROM rooms
+        SELECT id, identifier, name, building FROM rooms
           WHERE id=$1
       `, [room_id]);
 
