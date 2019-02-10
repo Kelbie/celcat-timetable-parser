@@ -205,6 +205,12 @@ async function getClasses(group_id) {
       )
   `, [group_id]);
 
+  var link = await client.query(`
+    SELECT link FROM groups
+      WHERE id=$1
+  `, [group_id]);
+
+  link = link.rows[0].link
   
   for (let i = 0; i < classes.rows.length; i++) {
     const class_ = classes.rows[i];
@@ -268,7 +274,7 @@ async function getClasses(group_id) {
     }
   }
 
-  return classes.rows;
+  return {link: `http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${link}`, classes: classes.rows};
 }
 
 async function getGroups() {
