@@ -128,7 +128,7 @@ module.exports = {
   },
   pdf: async function() {
     const PDFs = await db.getPDFs();
-    for (let i = 0; i < PDFs.length; i++) {
+    for (let i = 28; i < PDFs.length; i++) {
       var PDF = PDFs[i].link;
       var file = fs.createWriteStream(`timetables/${PDF}`);
       await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, function(response) {
