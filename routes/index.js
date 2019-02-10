@@ -124,11 +124,13 @@ function raw2dict(class_object, data) {
 
   for (let j = 0; j < types.length; j++) {
     const type = types[j];
-    if (types[j] == types[10]) {
+    if (removeWhitespace(class_object.raw).includes("Laboratory")) {
       class_object["type"] = "Laboratory"
+      break;
     }
-    if (types[j] == types[11]) {
+    if (removeWhitespace(class_object.raw).includes("Lecture")) {
       class_object["type"] = "Lecture"
+      break;
     }
   }
 
