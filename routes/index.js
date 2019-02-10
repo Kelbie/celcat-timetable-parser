@@ -4,32 +4,26 @@ var async = require("async");
 var fs = require("fs");
 var router = express.Router();
 
-const types = [
-  "Event- Board",
-  "Event- External",
-  "Event- Internal",
-  "Event- Student/SU",
-  "Staff N/A- Non-teaching Time",
-  "Staff N/A- Part-time",
-  "Staff N/A- Research Time",
-  "Teaching- Directed Study",
-  "Teaching- Distance Learning",
-  "Teaching- Enrolment/Induction",
-  "Teaching- Laboratory/Practical",
-  "Teaching- Lecture",
-  "Teaching- Online",
-  "Teaching- Other",
-  "Teaching- Placement/Off-site",
-  "Teaching- Seminar/Tutorial/Workshop",
-  "Teaching- Short Course",
-  "z- Ad-hoc Assessment",
-  "z- Building Closed",
-  "z- Examination Period"
-];
-
 const types_min = {
-  "Teaching- Laboratory/Practical": "Laboratory",
-  "Teaching- Lecture": "Lecture"
+  "Event- Board": "Board",
+  "Event- External": "External",
+  "Event- Internal": "Internal",
+  "Event- Student/SU": ["Student", "SU"],
+  "Staff N/A- Non-teaching Time": "Non-teaching Time",
+  "Staff N/A- Part-time": "Part-time",
+  "Staff N/A- Research Time": "Research Time",
+  "Teaching- Directed Study": "Directed Study",
+  "Teaching- Distance Learning": "Distance Learning",
+  "Teaching- Enrolment/Induction": ["Enrolment", "Induction"],
+  "Teaching- Laboratory/Practical": ["Laboratory", "Practical"],
+  "Teaching- Lecture": "Lecture",
+  "Teaching- Other": "Other",
+  "Teaching- Placement/Off-site": ["Placement", "Off-site"],
+  "Teaching- Seminar/Tutorial/Workshop": ["Seminar", "Tutorial", "Workshop"],
+  "Teaching- Short Course": "Short Course",
+  "z- Ad-hoc Assessment": "Assessment",
+  "z- Building Closed": "Building Closed",
+  "z- Examination Period": "Examination Period"
 }
 
 var scrape = require("./scrape");
@@ -43,7 +37,7 @@ function removeWhitespace(str) {
 
 async function test() {
   await db.init();
-  // await scrape.all();
+  await scrape.all();
   // await scrape.pdf();
   
   
@@ -122,14 +116,10 @@ function raw2dict(class_object, data) {
     }
   }
 
-  for (let j = 0; j < types.length; j++) {
-    const type = types[j];
-    if (removeWhitespace(class_object.raw).includes("Laboratory")) {
-      class_object["type"] = "Laboratory"
-      break;
-    }
-    if (removeWhitespace(class_object.raw).includes("Lecture")) {
-      class_object["type"] = "Lecture"
+  for (let j = 0; j < Object.keys(types_min).length; j++) {
+    const type = Object.keys(types_min)[j];
+    if (removeWhitespace(class_object.raw).includes(removeWhitespace(type))) {
+      class_object["type"] = types_min[type];
       break;
     }
   }
@@ -153,8 +143,8 @@ async function pair(txt, data) {
   var group_by_day = { classes: [] };
   for (let i = 0; i < txt_list.length; i++) {
     const element = txt_list[i];
-    if (contains(removeWhitespace(element), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
-      if (contains(removeWhitespace(class_object.raw), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
+    if (contains(removeWhitespace(element), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
+      if (contains(removeWhitespace(class_object.raw), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
         class_object = raw2dict(class_object, data);
         group_by_day["classes"].push(class_object)
       }
@@ -195,7 +185,7 @@ async function pair(txt, data) {
         group_by_day["date"] = date;
         group_by_day["day"] = day;
   
-        if (class_object.raw != "" && contains(removeWhitespace(class_object.raw), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
+        if (class_object.raw != "" && contains(removeWhitespace(class_object.raw), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
           class_object = raw2dict(class_object, data)
           group_by_day.classes.push(class_object);
         }
@@ -228,7 +218,7 @@ async function pair(txt, data) {
       }
     }  
 
-    if (i - 10 < group_reset) {
+    if (i - 25 < group_reset) {
       class_object["raw"] += element;
     }
 
