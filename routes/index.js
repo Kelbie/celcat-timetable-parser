@@ -46,19 +46,25 @@ async function test() {
   // await scrape.all();
   // await scrape.pdf();
   
-  // fs.readdir("timetables", (err, files) => {
-  //   files.forEach(async (file) => {
-  //     const txt = await pdf2txt.transform(file);
-  //     const data = {
-  //       modules: await db.getModules(),
-  //       staff: await db.getStaff(),
-  //       groups: await db.getGroups(),
-  //       rooms: await db.getRooms()
-  //     }
+  
+  const data = {
+    modules: await db.getModules(),
+    staff: await db.getStaff(),
+    groups: await db.getGroups(),
+    rooms: await db.getRooms()
+  }
 
-  //     await pair(txt, data);
-  //   });
-  // })
+  fs.readdir("timetables", async (err, files) => {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file != ".DS_Store") {
+        
+        const txt = await pdf2txt.transform(file);
+
+        await pair(txt, data);
+      }
+    }
+  })
 
 }
 
@@ -145,7 +151,6 @@ async function pair(txt, data) {
   var group_by_day = { classes: [] };
   for (let i = 0; i < txt_list.length; i++) {
     const element = txt_list[i];
-    
     if (contains(removeWhitespace(element), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
       if (contains(removeWhitespace(class_object.raw), [removeWhitespace(types[10]), removeWhitespace(types[11])])) {
         class_object = raw2dict(class_object, data);
@@ -263,7 +268,6 @@ router.get("/staff/count", async (req, res, next) => {
 
 router.get("/modules/count", async (req, res, next) => {
   const count = await db.countModules();
-  console.log(count)
   res.json(count)
 });
 

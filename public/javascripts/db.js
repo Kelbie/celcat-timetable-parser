@@ -124,7 +124,7 @@ async function get(table, options) {
       WHERE ${where};
   `, []);
 
-  return response.rows[0];
+  return response.rows;
 }
 
 async function addStaff(args) {
