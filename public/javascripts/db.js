@@ -296,9 +296,14 @@ async function getPDFs() {
 }
 
 async function countX(table) {
-  const count = await client.query(`
-    SELECT count(*) FROM ${table}
-  `, []);
+  const command = `
+    SELECT COUNT(*) FROM ${table}
+  `
+
+  console.log(command)
+
+  const count = await client.query(
+    command, []);
 
   return count.rows[0]
 }

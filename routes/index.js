@@ -39,7 +39,7 @@ function removeWhitespace(str) {
 async function test() {
   await db.init();
   await scrape.all();
-  // await scrape.pdf();
+  await scrape.pdf();
   
   fs.readdir("timetables", (err, files) => {
     files.forEach(async (file) => {
@@ -98,7 +98,6 @@ function raw2dict(class_object, data) {
       class_object["rooms"].push(data.rooms[j]);
     }
   }
-  
   
   for (let j = 0; j < data.modules.length; j++) {
     if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.modules[j].identifier))) {
@@ -236,34 +235,40 @@ router.get("/modules", async (req, res, next) => {
   res.json(modules);
 });
 
+router.get("/groups/count", async (req, res, next) => {
+  const count = await db.countGroups();
+  res.json(count)
+});
+
+router.get("/staff/count", async (req, res, next) => {
+  const count = await db.countStaff();
+  res.json(count)
+});
+
+router.get("/modules/count", async (req, res, next) => {
+  const count = await db.countModules();
+  console.log(count)
+  res.json(count)
+});
+
+router.get("/rooms/count", async (req, res, next) => {
+  const count = await db.countRooms();
+  res.json(count)
+});
+
 router.get("/modules/:id", async (req, res, next) => {
   const modules = await db.getModules({where: `id=${req.params.id}`, select: "id, identifier, name"});
   res.json(modules);
 });
 
+router.get("/groups/:id", async (req, res, next) => {
+  const groups = await db.getGroups({where: `id=${req.params.id}`, select: "id, identifier, name"});
+  res.json(groups);
+});
+
 router.get("/classes/:group_id", async (req, res, next) => {
   const classes = await db.getClasses(req.params.group_id);
   res.json(classes);
-});
-
-router.get("/groups/count", async (req, res, next) => {
-  const count = db.countGroups();
-  res.json(count)
-});
-
-router.get("/staff/count", async (req, res, next) => {
-  const count = db.countStaff();
-  res.json(count)
-});
-
-router.get("/modules/count", async (req, res, next) => {
-  const count = db.countModules();
-  res.json(count)
-});
-
-router.get("/rooms/count", async (req, res, next) => {
-  const count = db.countRooms();
-  res.json(count)
 });
 
 module.exports = router;
