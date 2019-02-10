@@ -193,13 +193,12 @@ async function addClass(args) {
       await addClassGroups(args.groups, class_.id);
     }
   }
-
 }
 
 async function getClasses(group_id) {
 
   var classes = await client.query(`
-    SELECT id, start, finish, date, module_id, raw FROM class
+    SELECT id, start, finish, date, module_id, type FROM class
       WHERE id = ANY(
         SELECT class_id FROM class_groups
           WHERE group_id=$1
@@ -306,7 +305,9 @@ async function countX(table) {
   const count = await client.query(
     command, []);
 
-  return count.rows[0]
+  count.rows[0].count = parseInt(count.rows[0].count)
+
+  return count.rows[0];
 }
 
 async function countGroups() {

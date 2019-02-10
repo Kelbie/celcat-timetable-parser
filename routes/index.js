@@ -282,7 +282,7 @@ router.get("/groups/:id", async (req, res, next) => {
   res.json(groups);
 });
 
-router.get("/classes/:group_id", async (req, res, next) => {
+router.get("/classes/group/:group_id", async (req, res, next) => {
   const classes = await db.getClasses(req.params.group_id);
   res.json(classes);
 });
