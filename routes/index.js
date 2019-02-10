@@ -27,6 +27,11 @@ const types = [
   "z- Examination Period"
 ];
 
+const types_min = {
+  "Teaching- Laboratory/Practical": "Laboratory",
+  "Teaching- Lecture": "Lecture"
+}
+
 var scrape = require("./scrape");
 var pdf2txt = require("./pdf2txt");
 var db = require("../public/javascripts/db");
@@ -38,22 +43,22 @@ function removeWhitespace(str) {
 
 async function test() {
   await db.init();
-  await scrape.all();
-  await scrape.pdf();
+  // await scrape.all();
+  // await scrape.pdf();
   
-  fs.readdir("timetables", (err, files) => {
-    files.forEach(async (file) => {
-      const txt = await pdf2txt.transform(file);
-      const data = {
-        modules: await db.getModules(),
-        staff: await db.getStaff(),
-        groups: await db.getGroups(),
-        rooms: await db.getRooms()
-      }
+  // fs.readdir("timetables", (err, files) => {
+  //   files.forEach(async (file) => {
+  //     const txt = await pdf2txt.transform(file);
+  //     const data = {
+  //       modules: await db.getModules(),
+  //       staff: await db.getStaff(),
+  //       groups: await db.getGroups(),
+  //       rooms: await db.getRooms()
+  //     }
 
-      await pair(txt, data);
-    });
-  })
+  //     await pair(txt, data);
+  //   });
+  // })
 
 }
 
@@ -108,6 +113,16 @@ function raw2dict(class_object, data) {
   for (let j = 0; j < data.groups.length; j++) {
     if (removeWhitespace(class_object["raw"]).includes(removeWhitespace(data.groups[j].identifier))) {
       class_object["groups"].push(data.groups[j]);
+    }
+  }
+
+  for (let j = 0; j < types.length; j++) {
+    const type = types[j];
+    if (types[j] == types[10]) {
+      class_object["type"] = "Laboratory"
+    }
+    if (types[j] == types[11]) {
+      class_object["type"] = "Lecture"
     }
   }
 
@@ -183,6 +198,7 @@ async function pair(txt, data) {
           if (class_.module != undefined) {
             await db.addClass({
               raw: class_.raw,
+              type: class_.type,
               module_id: class_.module.id,
               date: date,
               start: class_.time.start,

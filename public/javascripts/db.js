@@ -60,6 +60,7 @@ async function init() {
       start VARCHAR,
       finish VARCHAR,
       date DATE,
+      type VARCHAR,
       PRIMARY KEY (id),
       UNIQUE (date, start, module_id)
     );
@@ -123,7 +124,7 @@ async function get(table, options) {
       WHERE ${where};
   `, []);
 
-  return response.rows;
+  return response.rows[0];
 }
 
 async function addStaff(args) {
@@ -171,11 +172,11 @@ async function addClass(args) {
 
   var class_ = await client.query(`
       INSERT INTO class (
-        raw, module_id, start, finish, date
-      ) VALUES ($1, $2, $3, $4, $5)
+        raw, module_id, start, finish, date, type
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       ON CONFLICT (module_id, start, date) DO NOTHING
         RETURNING id;
-    `, [args.raw, args.module_id, args.start, args.finish, args.date]);
+    `, [args.raw, args.module_id, args.start, args.finish, args.date, args.type]);
 
   
   class_ = class_.rows[0]
