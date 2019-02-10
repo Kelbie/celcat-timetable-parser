@@ -206,6 +206,44 @@ Many to many for `staff` and `rooms` since a staff member can have many classes 
 
 # Endpoints
 ```
+GET /classes/group/:group_id
+
+[
+  {
+    "id" :9,
+    "start": "11:00",
+    "finish": "12:00",
+    "date": "2019-02-04T00:00:00.000Z",
+    "type": "Lecture",
+    "rooms": [
+      {
+        "id": 62,
+        "identifier": "H234",
+        "name": "(147 cap L/T)"
+      }
+    ],
+    "groups": [
+      {
+        "id": 296,
+        "identifier": " CM3-CNMD",
+        "name": "CM3 Computer Network Management & Design"
+      }, ... ],
+    "staff": [
+      {
+        "id": 973,
+        "first": "Ian",
+        "last": "Harris",
+        "tag": null
+      }, ... ],
+    "module": {
+      "id": 2265,
+      "identifier": "CM3104",
+      "name": "COMPUTER SECURITY AND CRYPTOGRAPHY - CM3104"
+    }
+  } ... ]
+```
+
+```
 GET /modules
 
 [
@@ -213,11 +251,6 @@ GET /modules
     "id": 1,
     "identifier": "AA1001",
     "name": "DRAWING & VISUALISATION 1 - AA1001"
-  }, 
-  {
-    "id": 2,
-    "identifier": "AA1001-YEAR-A",
-    "name": "DRAWING & VISUALISATION 1"
   }, ... ]
 ```
 
@@ -232,7 +265,33 @@ GET /modules/:id
 ```
 
 ```
-GET /classes/:module_id
+GET /modules/count
 
+{
+  "count": 4521
+}
+```
 
+```
+GET /staff/count
+
+{
+  "count": 2684
+}
+```
+
+```
+GET /groups/count
+
+{
+  "count": 679
+}
+```
+
+```
+GET /rooms/count
+
+{
+  "count": 203
+}
 ```
