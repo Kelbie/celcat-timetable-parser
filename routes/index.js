@@ -188,7 +188,7 @@ async function pair(txt, data) {
               raw: class_.raw,
               type: class_.type,
               module_id: class_.module.id,
-              start: new Date(date[2], date[1]-1, date[0], end.split(":")[0], end.split(":")[1]).getTime() / 1000,
+              start: new Date(date[2], date[1]-1, date[0], start.split(":")[0], start.split(":")[1]).getTime() / 1000,
               finish: new Date(date[2], date[1]-1, date[0], end.split(":")[0], end.split(":")[1]).getTime() / 1000,
               staff: class_.staff.map(staff => {return staff.id}),
               rooms: class_.rooms.map(room => {return room.id}),
@@ -213,19 +213,6 @@ async function pair(txt, data) {
     }
 
   }
-
-  const fs = require("fs");
-  fs.writeFile("public/test.json", JSON.stringify(classes), function(err) {
-    if (err) {
-      return console.log(2, err);
-    }
-
-    console.log("The file was saved!");
-  });
-  // console.log(classes);
-  return {
-    year: txt_list[0]
-  };
 }
 
 /* GET home page. */
