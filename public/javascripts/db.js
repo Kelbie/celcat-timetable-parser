@@ -194,20 +194,20 @@ async function addClass(args) {
   }
 }
 
-async function getClasses(group_id) {
+async function getClassesByX(table, id, id_value) {
 
   var classes = await client.query(`
     SELECT id, start, finish, module_id, type FROM class
       WHERE id = ANY(
-        SELECT class_id FROM class_groups
-          WHERE group_id=$1
+        SELECT class_id FROM class_${table}
+          WHERE ${id}=$1
       )
-  `, [group_id]);
+  `, [id_value]);
 
   var link = await client.query(`
-    SELECT link FROM groups
+    SELECT link FROM ${table}
       WHERE id=$1
-  `, [group_id]);
+  `, [id_value]);
 
   link = link.rows[0].link
   
@@ -274,6 +274,18 @@ async function getClasses(group_id) {
   }
 
   return {link: `http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${link}`, classes: classes.rows};
+}
+
+async function getClassesByGroup(group_id) {
+  return await getClassesByX("groups", "group_id", group_id)
+}
+
+async function getClassesByRoom(room_id) {
+  return await getClassesByX("rooms", "room_id", room_id)
+}
+
+async function getClassesByStaff(staff_id) {
+  return await getClassesByX("staff", "staff_id", staff_id)
 }
 
 async function getGroups() {
@@ -346,7 +358,9 @@ module.exports = {
   addRoom,
   addGroup,
   addClass,
-  getClasses,
+  getClassesByRoom,
+  getClassesByGroup,
+  getClassesByStaff,
   getGroups,
   getModules,
   getRooms,

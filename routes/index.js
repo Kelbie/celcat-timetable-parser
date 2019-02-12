@@ -256,7 +256,17 @@ router.get("/groups/:id", async (req, res, next) => {
 });
 
 router.get("/classes/group/:group_id", async (req, res, next) => {
-  const classes = await db.getClasses(req.params.group_id);
+  const classes = await db.getClassesByGroup(req.params.group_id);
+  res.json(classes);
+});
+
+router.get("/classes/room/:room_id", async (req, res, next) => {
+  const classes = await db.getClassesByRoom(req.params.room_id);
+  res.json(classes);
+});
+
+router.get("/classes/staff/:staff_id", async (req, res, next) => {
+  const classes = await db.getClassesByStaff(req.params.staff_id);
   res.json(classes);
 });
 
