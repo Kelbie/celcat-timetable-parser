@@ -124,15 +124,6 @@ function raw2dict(class_object, data) {
     }
   }
 
-  time = removeWhitespace(class_object.raw).match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
-  time = time.replace(/^\s+|\s+$/g, "");
-  var [start, end] = time.split("-");
-
-  class_object["time"] = {
-    start: start,
-    end: end
-  };
-
   return class_object;
 }
 
@@ -178,13 +169,6 @@ async function pair(txt, data) {
           day = "Sunday"
         } 
   
-        var date = element.match(/[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g)[0].split("/");
-        date = `${date[2]}-${date[1]}-${date[0]}`
-
-
-        group_by_day["date"] = date;
-        group_by_day["day"] = day;
-  
         if (class_object.raw != "" && contains(removeWhitespace(class_object.raw), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
           class_object = raw2dict(class_object, data)
           group_by_day.classes.push(class_object);
@@ -192,14 +176,20 @@ async function pair(txt, data) {
 
         for (let k = 0; k < group_by_day.classes.length; k++) {
           const class_ = group_by_day.classes[k];
+
+          var date = element.match(/[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g)[0].split("/");
+
+          time = removeWhitespace(class_.raw).match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
+          time = time.replace(/^\s+|\s+$/g, "");
+          var [start, end] = time.split("-");
+
           if (class_.module != undefined) {
             await db.addClass({
               raw: class_.raw,
               type: class_.type,
               module_id: class_.module.id,
-              date: date,
-              start: class_.time.start,
-              finish: class_.time.end,
+              start: new Date(date[2], date[1]-1, date[0], end.split(":")[0], end.split(":")[1]).getTime() / 1000,
+              finish: new Date(date[2], date[1]-1, date[0], end.split(":")[0], end.split(":")[1]).getTime() / 1000,
               staff: class_.staff.map(staff => {return staff.id}),
               rooms: class_.rooms.map(room => {return room.id}),
               groups: class_.groups.map(group => {return group.id})

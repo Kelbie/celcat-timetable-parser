@@ -8,10 +8,9 @@ GET /classes/group/:group_id
   "link": "http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/g16737.pdf",
   "classes": [
     {
-      "id" :9,
+      "id": 9,
       "start": "11:00",
       "finish": "12:00",
-      "date": "2019-02-04T00:00:00.000Z",
       "type": "Lecture",
       "rooms": [
         {

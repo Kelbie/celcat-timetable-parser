@@ -57,12 +57,11 @@ async function init() {
       id SERIAL,
       raw VARCHAR,
       module_id INT,
-      start VARCHAR,
-      finish VARCHAR,
-      date DATE,
+      start BIGINT,
+      finish BIGINT,
       type VARCHAR,
       PRIMARY KEY (id),
-      UNIQUE (date, start, module_id)
+      UNIQUE (start, module_id)
     );
   `, []);
 
@@ -172,11 +171,11 @@ async function addClass(args) {
 
   var class_ = await client.query(`
       INSERT INTO class (
-        raw, module_id, start, finish, date, type
-      ) VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT (module_id, start, date) DO NOTHING
+        raw, module_id, start, finish, type
+      ) VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (module_id, start) DO NOTHING
         RETURNING id;
-    `, [args.raw, args.module_id, args.start, args.finish, args.date, args.type]);
+    `, [args.raw, args.module_id, args.start, args.finish, args.type]);
 
   
   class_ = class_.rows[0]
@@ -198,7 +197,7 @@ async function addClass(args) {
 async function getClasses(group_id) {
 
   var classes = await client.query(`
-    SELECT id, start, finish, date, module_id, type FROM class
+    SELECT id, start, finish, module_id, type FROM class
       WHERE id = ANY(
         SELECT class_id FROM class_groups
           WHERE group_id=$1
