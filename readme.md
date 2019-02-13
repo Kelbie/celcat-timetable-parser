@@ -9,8 +9,8 @@ GET /classes/group/:group_id
   "classes": [
     {
       "id": 9,
-      "start": "11:00",
-      "finish": "12:00",
+      "start": "1549364400",
+      "finish": "1549368000",
       "type": "Lecture",
       "rooms": [
         {
