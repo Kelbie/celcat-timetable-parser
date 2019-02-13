@@ -225,6 +225,21 @@ router.get("/modules", async (req, res, next) => {
   res.json(modules);
 });
 
+router.get("/staff", async (req, res, next) => {
+  const staff = await db.getStaff({select: "id, first, last, tag"});
+  res.json(staff);
+});
+
+router.get("/groups", async (req, res, next) => {
+  const groups = await db.getGroups({select: "id, identifier"});
+  res.json(groups);
+});
+
+router.get("/rooms", async (req, res, next) => {
+  const rooms = await db.getRooms({select: "id, identifier, name, building"})
+  res.json(rooms)
+});
+
 router.get("/groups/count", async (req, res, next) => {
   const count = await db.countGroups();
   res.json(count)
@@ -245,14 +260,24 @@ router.get("/rooms/count", async (req, res, next) => {
   res.json(count)
 });
 
-router.get("/modules/:id", async (req, res, next) => {
+router.get("/module/:id", async (req, res, next) => {
   const modules = await db.getModules({where: `id=${req.params.id}`, select: "id, identifier, name"});
   res.json(modules);
 });
 
-router.get("/groups/:id", async (req, res, next) => {
+router.get("/group/:id", async (req, res, next) => {
   const groups = await db.getGroups({where: `id=${req.params.id}`, select: "id, identifier, name"});
   res.json(groups);
+});
+
+router.get("/room/:id", async (req, res, next) => {
+  const rooms = await db.getRooms({where: `id=${req.params.id}`, select: "id, identifier, name, building"});
+  res.json(rooms);
+});
+
+router.get("/staff/:id", async (req, res, next) => {
+  const staff = await db.getStaff({where: `id=${req.params.id}`, select: "id, first, last, tag"});
+  res.json(staff);
 });
 
 router.get("/classes/group/:group_id", async (req, res, next) => {

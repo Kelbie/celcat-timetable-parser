@@ -288,20 +288,20 @@ async function getClassesByStaff(staff_id) {
   return await getClassesByX("staff", "staff_id", staff_id)
 }
 
-async function getGroups() {
-  return await get("groups")
+async function getGroups(options) {
+  return await get("groups", options)
 }
 
-async function getStaff() {
-  return await get("staff")
+async function getStaff(options) {
+  return await get("staff", options)
 }
 
 async function getModules(options) {
   return await get("modules", options)
 }
 
-async function getRooms() {
-  return await get("rooms")
+async function getRooms(options) {
+  return await get("rooms", options)
 }
 
 async function getPDFs() {
@@ -316,8 +316,6 @@ async function countX(table) {
   const command = `
     SELECT COUNT(*) FROM ${table}
   `
-
-  console.log(command)
 
   const count = await client.query(
     command, []);
