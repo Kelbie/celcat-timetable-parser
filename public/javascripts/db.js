@@ -1,7 +1,12 @@
 const  async = require("async");
 const { Client } = require('pg')
-  const client = new Client({
-  })
+
+const client = new Client({
+	database: "postgres",
+	port: 5432,
+	user: "postgres",
+	password: "postgres"
+});
 
 client.connect()
 
