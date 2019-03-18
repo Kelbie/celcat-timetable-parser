@@ -13,6 +13,7 @@ const client = new Client({
 client.connect()
 
 async function init() {
+  // create staff table
   await client.query(`
     CREATE TABLE IF NOT EXISTS staff (
       id SERIAL, 
@@ -25,6 +26,7 @@ async function init() {
     );
   `, []);
 
+  // create rooms table
   await client.query(`
     CREATE TABLE IF NOT EXISTS rooms (
       id SERIAL,
@@ -37,6 +39,7 @@ async function init() {
     );
   `, []);
 
+  // create modules table
   await client.query(`
     CREATE TABLE IF NOT EXISTS modules (
       id SERIAL, 
@@ -48,6 +51,7 @@ async function init() {
     );
   `, []);
 
+  // create groups table
   await client.query(`
     CREATE TABLE IF NOT EXISTS groups (
       id SERIAL,
@@ -59,6 +63,7 @@ async function init() {
     );
   `, []);
 
+  // create class table
   await client.query(`
     CREATE TABLE IF NOT EXISTS class (
       id SERIAL,
@@ -72,6 +77,7 @@ async function init() {
     );
   `, []);
 
+  // create table that maps staff to classes
   await client.query(`
     CREATE TABLE IF NOT EXISTS class_staff (
       staff_id INT,
@@ -81,6 +87,7 @@ async function init() {
     );
   `, []);
 
+  // create table that maps rooms to classes
   await client.query(`
     CREATE TABLE IF NOT EXISTS class_rooms (
       room_id INT,
@@ -90,6 +97,7 @@ async function init() {
     )
   `, []);
 
+  // create table that maps groups to classes
   await client.query(`
     CREATE TABLE IF NOT EXISTS class_groups (
       group_id INT,
@@ -152,6 +160,7 @@ async function addGroup(args) {
 }
 
 async function addClassX(table, type_id, arr, class_id) {
+  console.log(x_id, class_id)
   await arr.forEach(async (x_id) => {
     await client.query(`
       INSERT INTO ${table} (
@@ -203,20 +212,26 @@ async function addClass(args) {
 
 async function getClassesByX(table, id, id_value) {
 
-  var classes = await client.query(`
-    SELECT id, start, finish, module_id, type FROM class
-      WHERE id = ANY(
-        SELECT class_id FROM class_${table}
-          WHERE ${id}=$1
-      )
-  `, [id_value]);
+  if (table == null) {
+    var classes = await client.query(`
+      SELECT id, start, finish, module_id, type FROM class
+    `);
+  } else {
+    var classes = await client.query(`
+      SELECT id, start, finish, module_id, type FROM class
+        WHERE id = ANY(
+          SELECT class_id FROM class_${table}
+            WHERE ${id}=$1
+        )
+    `, [id_value]);
 
-  var link = await client.query(`
-    SELECT link FROM ${table}
-      WHERE id=$1
-  `, [id_value]);
+    var link = await client.query(`
+      SELECT link FROM ${table}
+        WHERE id=$1
+    `, [id_value]);
 
-  link = link.rows[0].link
+    link = link.rows[0].link
+  }
   
   for (let i = 0; i < classes.rows.length; i++) {
     const class_ = classes.rows[i];
@@ -281,6 +296,10 @@ async function getClassesByX(table, id, id_value) {
   }
 
   return {link: `http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${link}`, classes: classes.rows};
+}
+
+async function getClasses() {
+  return await getClassesByX(null, null, null);
 }
 
 async function getClassesByGroup(group_id) {
@@ -363,6 +382,7 @@ module.exports = {
   addRoom,
   addGroup,
   addClass,
+  getClasses,
   getClassesByRoom,
   getClassesByGroup,
   getClassesByStaff,
