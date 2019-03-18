@@ -1,11 +1,13 @@
 const  async = require("async");
 const { Client } = require('pg')
 
+// Docker should make sure that postgres is running before allowing node to connect
 const client = new Client({
-	database: "postgres",
-	port: 5432,
-	user: "postgres",
-	password: "postgres"
+  database: process.env.DB_NAME || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: 5432,
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres'
 });
 
 client.connect()
