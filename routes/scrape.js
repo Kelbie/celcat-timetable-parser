@@ -128,13 +128,21 @@ module.exports = {
   },
   pdf: async function() {
     const PDFs = await db.getPDFs();
-    for (let i = 28; i < PDFs.length; i++) {
+    let start, end;
+    if (process.env.NODE_ENV == "development") {
+      start = 0;
+      end = Math.max(5, PDFs.length);
+    } else if (process.env.NODE_ENV == "production") {
+      start = 0;
+      end = PDFs.length
+    }
+    for (let i = start; i < end; i++) {
       var PDF = PDFs[i].link;
       var file = fs.createWriteStream(`timetables/${PDF}`);
       await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, function(response) {
         response.pipe(file);
       });
-      await sleep(120000);
+      await sleep(20000);
     }
   }
 }

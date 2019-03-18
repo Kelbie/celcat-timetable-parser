@@ -38,7 +38,7 @@ function removeWhitespace(str) {
 async function test() {
   await db.init();
   await scrape.all();
-  // await scrape.pdf();
+  await scrape.pdf();
   
   
   const data = {
