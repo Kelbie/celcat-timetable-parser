@@ -131,11 +131,12 @@ module.exports = {
     let start, end;
     if (process.env.NODE_ENV == "development") {
       start = 0;
-      end = Math.max(5, PDFs.length);
+      end = Math.min(5, PDFs.length);
     } else if (process.env.NODE_ENV == "production") {
       start = 0;
       end = PDFs.length
     }
+    
     for (let i = start; i < end; i++) {
       var PDF = PDFs[i].link;
       var file = fs.createWriteStream(`timetables/${PDF}`);
