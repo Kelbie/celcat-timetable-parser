@@ -36,10 +36,12 @@ function removeWhitespace(str) {
 }
 
 async function test() {
+  // initialize the database
   await db.init();
+  // get the schema
   await scrape.all();
+  // get pdfs to be parsed
   await scrape.pdf();
-  
   
   const data = {
     modules: await db.getModules(),
@@ -48,13 +50,17 @@ async function test() {
     rooms: await db.getRooms()
   }
 
+  // read from timetables folder
   fs.readdir("timetables", async (err, files) => {
+    // loop over pdfs in timetable folder
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file != ".DS_Store") {
         
+        // converts pdf into text
         const txt = await pdf2txt.transform(file);
 
+        // uses the data schema to figure out whats going on in the text
         await pair(txt, data);
       }
     }
