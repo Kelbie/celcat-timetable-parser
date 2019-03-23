@@ -223,7 +223,7 @@ async function pair(txt, data) {
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Express" });
+  res.json({"paths": ["/modules"]})
 });
 
 router.get("/modules", async (req, res, next) => {
