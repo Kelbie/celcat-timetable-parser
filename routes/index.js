@@ -223,7 +223,58 @@ async function pair(txt, data) {
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
-  res.json({"paths": ["/modules"]})
+  res.json({
+    "paths": [{
+        path: "/modules", 
+        desc: "returns list of all modules"
+      }, {
+        path: "/staff", 
+        desc: "returns list of all staff"
+      }, {
+        path: "/groups", 
+        desc: "returns list of all groups"
+      }, {
+        path: "/rooms", 
+        desc: "returns list of all rooms"
+      }, {
+        path: "/modules/count", 
+        desc: "returns total number of modules"
+      }, {
+        path: "/staff/count", 
+        desc: "returns total number of staff"
+      }, {
+        path: "/groups/count", 
+        desc: "returns total number of groups"
+      }, {
+        path: "/rooms/count", 
+        desc: "returns total number of rooms"
+      }, {
+        path: "/module/:id", 
+        desc: "where :id is the id of the module it returns more info about it"
+      }, {
+        path: "/staff/:id", 
+        desc: "where :id is the id of the staff member it returns more info about it"
+      }, {
+        path: "/group/:id", 
+        desc: "where :id is the id of the group it returns more info about it"
+      }, {
+        path: "/rooms/:id", 
+        desc: "where :id is the id of the room it returns more info about it"
+      }, {
+        path: "/classes/staff/:staff_id", 
+        desc: "where :staff_id is the id of the staff member it returns all the classes associated with them"
+      }, {
+        path: "/classes/group/:group_id", 
+        desc: "where :group_id is the id of the group it returns all the classes associated with it"
+      }, {
+        path: "/classes/room/:room_id", 
+        desc: "where :room_id is the id of the room it returns all the classes associated with it"
+      }, {
+        path: "/classes",
+        desc: "returns list of all classes"
+      }
+    ]
+  })
 });
 
 router.get("/modules", async (req, res, next) => {
