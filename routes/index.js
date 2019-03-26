@@ -40,31 +40,26 @@ async function test() {
   await db.init();
   // get the schema
   await scrape.all();
-  // get pdfs to be parsed
-  await scrape.pdf();
-  
-  const data = {
-    modules: await db.getModules(),
-    staff: await db.getStaff(),
-    groups: await db.getGroups(),
-    rooms: await db.getRooms()
-  }
 
-  // read from timetables folder
-  fs.readdir("timetables", async (err, files) => {
-    // loop over pdfs in timetable folder
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file != ".DS_Store") {
-        
-        // converts pdf into text
-        const txt = await pdf2txt.transform(file);
-
-        // uses the data schema to figure out whats going on in the text
-        await pair(txt, data);
-      }
+  // get and parse all timetables
+  await scrape.pdf(async function(file) {
+    const data = {
+      modules: await db.getModules(),
+      staff: await db.getStaff(),
+      groups: await db.getGroups(),
+      rooms: await db.getRooms()
     }
-  })
+  
+    console.log(`Parsing ${file}`);
+
+    // converts pdf into text
+    const txt = await pdf2txt.transform(file);
+
+    // uses the data schema to figure out whats going on in the text
+    await pair(txt, data);
+  });
+
+  
 
 }
 
@@ -255,7 +250,7 @@ router.get("/", function(req, res, next) {
         path: "/staff/:id", 
         desc: "where :id is the id of the staff member it returns more info about it"
       }, {
-        path: "/group/:id", 
+        path: "/group/:id",
         desc: "where :id is the id of the group it returns more info about it"
       }, {
         path: "/rooms/:id", 

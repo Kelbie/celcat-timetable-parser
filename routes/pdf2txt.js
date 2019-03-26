@@ -13,7 +13,6 @@ module.exports = {
       );
 
       pdfParser.on("pdfParser_dataReady", pdfData => {
-        // fs.writeFile(`${file}`, pdfParser.getRawTextContent());
         resolve(pdfParser.getRawTextContent());
       });
 

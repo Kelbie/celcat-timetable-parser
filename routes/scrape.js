@@ -124,9 +124,10 @@ async function sleep(millis) {
 
 module.exports = {
   all: async function() {
+    console.log("Downloading Schema...")
     return await download();
   },
-  pdf: async function() {
+  pdf: async function(callback) {
     const PDFs = await db.getPDFs();
     let start, end;
     if (process.env.NODE_ENV == "development") {
@@ -137,13 +138,17 @@ module.exports = {
       end = PDFs.length
     }
     
-    for (let i = start; i < end; i++) {
+    for (let i = 0; i < end; i++) {
       var PDF = PDFs[i].link;
+      console.log(`Scraping ${PDFs[i].link}`)
       var file = fs.createWriteStream(`timetables/${PDF}`);
-      await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, function(response) {
-        response.pipe(file);
+      await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, async function(response) {
+        let stream = await response.pipe(file);
+        stream.on('finish', function() {
+          callback(PDF);
+        })
       });
-      await sleep(20000);
+      await sleep(30000);
     }
   }
 }
