@@ -13,6 +13,9 @@ const client = new Client({
 client.connect()
 
 async function init() {
+
+  console.log("Initializing Database...");
+
   // create staff table
   await client.query(`
     CREATE TABLE IF NOT EXISTS staff (
@@ -160,7 +163,6 @@ async function addGroup(args) {
 }
 
 async function addClassX(table, type_id, arr, class_id) {
-  console.log(x_id, class_id)
   await arr.forEach(async (x_id) => {
     await client.query(`
       INSERT INTO ${table} (
@@ -338,6 +340,15 @@ async function getPDFs() {
   return PDFs.rows
 }
 
+async function getGroupPDF(id) {
+  const PDFs = await client.query(`
+    SELECT link from groups
+      WHERE id=$1
+  `, [id]);
+
+  return PDFs.rows
+}
+
 async function countX(table) {
   const command = `
     SELECT COUNT(*) FROM ${table}
@@ -391,6 +402,7 @@ module.exports = {
   getRooms,
   getStaff,
   getPDFs,
+  getGroupPDF,
   countGroups,
   countModules,
   countRooms,
