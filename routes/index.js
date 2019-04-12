@@ -352,4 +352,9 @@ router.get("/classes", async (req, res, next) => {
   res.json(classes);
 });
 
+router.get("/class/:id", async(req, res, next) => {
+  const class_details = await db.getClassByID(req.params.id);
+  res.json(class_details);
+});
+
 module.exports = router;

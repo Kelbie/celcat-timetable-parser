@@ -386,6 +386,73 @@ async function countStaff() {
   return count;
 }
 
+async function getClassByID(id) {
+  var class_details = await client.query(`
+    SELECT * FROM class
+      WHERE id=$1
+  `, [id]);
+
+  class_details.rows[0].rooms = [];
+  class_details.rows[0].groups = [];
+  class_details.rows[0].staff = [];
+
+  var module = await client.query(`
+    SELECT * FROM modules
+      WHERE id=$1
+  `, [class_details.rows[0].module_id])
+  class_details.rows[0].module = module.rows[0];
+
+  // Get class rooms
+  var class_rooms = await client.query(`
+    SELECT * FROM class_rooms
+      WHERE class_id=$1
+  `, [id]);
+
+  for (let j = 0; j < class_rooms.rows.length; j++) {
+    const room_id = class_rooms.rows[j].room_id;
+    var room = await client.query(`
+      SELECT id, identifier, name, building FROM rooms
+        WHERE id=$1
+    `, [room_id]);
+
+    class_details.rows[0].rooms.push(room.rows[0]);
+  }
+
+  // Get staff
+  var class_staff = await client.query(`
+    SELECT * FROM class_staff
+      WHERE class_id=$1
+  `, [id]);
+
+  for (let j = 0; j < class_staff.rows.length; j++) {
+    const staff_id = class_staff.rows[j].staff_id;
+    var staff = await client.query(`
+      SELECT * FROM staff
+        WHERE id=$1
+    `, [staff_id]);
+
+    class_details.rows[0].staff.push(staff.rows[0]);
+  }
+
+  // Get groups
+  var class_groups = await client.query(`
+    SELECT * FROM class_groups
+      WHERE class_id=$1
+  `, [id]);
+
+  for (let j = 0; j < class_groups.rows.length; j++) {
+    const group_id = class_groups.rows[j].group_id;
+    var group = await client.query(`
+      SELECT * FROM groups
+        WHERE id=$1
+    `, [group_id]);
+
+    class_details.rows[0].groups.push(group.rows[0]);
+  }
+
+  return class_details.rows[0]
+}
+
 module.exports = {
   init,
   addStaff,
@@ -394,6 +461,7 @@ module.exports = {
   addGroup,
   addClass,
   getClasses,
+  getClassByID,
   getClassesByRoom,
   getClassesByGroup,
   getClassesByStaff,

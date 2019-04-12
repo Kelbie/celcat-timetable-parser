@@ -148,7 +148,7 @@ module.exports = {
           callback(PDF);
         })
       });
-      await sleep(30000);
+      await sleep(60000);
     }
   }
 }

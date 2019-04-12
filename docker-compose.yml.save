@@ -17,4 +17,4 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: postgres
-    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "start"]
+    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "dev"]
