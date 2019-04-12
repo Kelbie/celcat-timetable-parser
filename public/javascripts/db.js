@@ -386,14 +386,6 @@ async function countStaff() {
   return count;
 }
 
-async function getClassByID(id) {
-  const class_details = await client.query(`
-    SELECT * from class
-  `, []);
-
-  return class_details.rows
-}
-
 module.exports = {
   init,
   addStaff,
@@ -402,7 +394,6 @@ module.exports = {
   addGroup,
   addClass,
   getClasses,
-  getClassByID,
   getClassesByRoom,
   getClassesByGroup,
   getClassesByStaff,
