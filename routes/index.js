@@ -37,30 +37,33 @@ function removeWhitespace(str) {
 
 async function test() {
   // initialize the database
-  //await db.init();
+  await db.init();
   // get the schema
-  //await scrape.all();
+  await scrape.all();
 
   // get and parse all timetables
-  //await scrape.pdf(async function(file) {
-  //  const data = {
-  //    modules: await db.getModules(),
-  //    staff: await db.getStaff(),
-  //    groups: await db.getGroups(),
-  //    rooms: await db.getRooms()
-  //}
+  await scrape.pdf(async function(file) {
+   const data = {
+     modules: await db.getModules(),
+     staff: await db.getStaff(),
+     groups: await db.getGroups(),
+     rooms: await db.getRooms()
+  }
 
-  //console.log(`Parsing ${file}`);
+  console.log(`Parsing ${file}`);
 
   // converts pdf into text
-  //const txt = await pdf2txt.transform(file);
+  const txt = await pdf2txt.transform(file);
+  fs.writeFile(`txts/${file}.txt`, txt, (err) => {
+    if (err) console.log(err);
+  });
 
   // uses the data schema to figure out whats going on in the text
-  //await pair(txt, data);
-  //});
+  await pair(txt, data);
+  });
 }
 
-//test();
+test();
 
 function contains(target, pattern) {
   // Checks if any pattern element is in target
@@ -145,66 +148,68 @@ async function pair(txt, data) {
         true
       );
     }
-
-    if (contains(element, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])) {
-      var day;
-      var pattern = /\w*[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g
-      if (containsRegex(element, pattern)) {
-
-        if (element.includes("Monday")) {
-          day = "Monday"
-        } else if (element.includes("Tuesday")) {
-          day = "Tuesday"
-        } else if (element.includes("Wednesday")) {
-          day = "Wednesday"
-        } else if (element.includes("Thursday")) {
-          day = "Thursday"
-        } else if (element.includes("Friday")) {
-          day = "Friday"
-        } else if (element.includes("Saturday")) {
-          day = "Saturday"
-        } else if (element.includes("Sunday")) {
-          day = "Sunday"
-        } 
-  
-        if (class_object.raw != "" && contains(removeWhitespace(class_object.raw), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
-          class_object = raw2dict(class_object, data)
-          group_by_day.classes.push(class_object);
-        }
-
-        for (let k = 0; k < group_by_day.classes.length; k++) {
-          const class_ = group_by_day.classes[k];
-
-          var date = element.match(/[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g)[0].split("/");
-
-          time = removeWhitespace(class_.raw).match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
-          time = time.replace(/^\s+|\s+$/g, "");
-          var [start, end] = time.split("-");
-
-          if (class_.module != undefined) {
-            await db.addClass({
-              raw: class_.raw,
-              type: class_.type,
-              module_id: class_.module.id,
-              start: new Date(date[2], date[1]-1, date[0], start.split(":")[0], start.split(":")[1]).getTime() / 1000,
-              finish: new Date(date[2], date[1]-1, date[0], end.split(":")[0], end.split(":")[1]).getTime() / 1000,
-              staff: class_.staff.map(staff => {return staff.id}),
-              rooms: class_.rooms.map(room => {return room.id}),
-              groups: class_.groups.map(group => {return group.id})
-            }); 
-          }
-        }
-
-        classes.push(group_by_day);
-        group_by_day = { classes: [] };
-        [class_object, group_reset] = reset(
-          class_object,
-          group_reset,
-          i,
-          false
-        );
+    
+    var day;
+    var pattern = /[\w]*[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g
+    if (containsRegex(element, pattern)) {
+      
+      if (element.includes("Monday")) {
+        day = "Monday"
+      } else if (element.includes("Tuesday")) {
+        day = "Tuesday"
+      } else if (element.includes("Wednesday")) {
+        day = "Wednesday"
+      } else if (element.includes("Thursday")) {
+        day = "Thursday"
+      } else if (element.includes("Friday")) {
+        day = "Friday"
+      } else if (element.includes("Saturday")) {
+        day = "Saturday"
+      } else if (element.includes("Sunday")) {
+        day = "Sunday"
       }
-    }  
+      
+      if (class_object.raw != "" && contains(removeWhitespace(class_object.raw), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
+        class_object = raw2dict(class_object, data)
+        group_by_day.classes.push(class_object);
+      }
+      
+      // console.log("TEST " + element)
+      // console.log(group_by_day);
+      for (let k = 0; k < group_by_day.classes.length; k++) {
+        const class_ = group_by_day.classes[k];
+
+        var date = element.match(/[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]/g)[0].split("/");
+        
+        time = removeWhitespace(class_.raw).match(/[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]/g)[0]
+        time = time.replace(/^\s+|\s+$/g, "");
+        var [start, end] = time.split("-");
+        
+        if (class_.module != undefined) {
+          // console.log(k, date, new Date(date[2], date[1]-1, date[0], start.split(":")[0], start.split(":")[1]));
+          await db.addClass({
+            raw: class_.raw,
+            type: class_.type,
+            module_id: class_.module.id,
+            start: new Date(date[2], date[1]-1, date[0], start.split(":")[0], start.split(":")[1]).getTime() / 1000,
+            finish: new Date(date[2], date[1]-1, date[0], end.split(":")[0], end.split(":")[1]).getTime() / 1000,
+            staff: class_.staff.map(staff => {return staff.id}),
+            rooms: class_.rooms.map(room => {return room.id}),
+            groups: class_.groups.map(group => {return group.id})
+          }); 
+        }
+      }
+
+      
+      classes.push(group_by_day);
+      group_by_day = { classes: [] };
+      [class_object, group_reset] = reset(
+        class_object,
+        group_reset,
+        i,
+        false
+      );
+    }
 
     if (i - 25 < group_reset) {
       class_object["raw"] += element;

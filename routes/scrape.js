@@ -132,7 +132,7 @@ module.exports = {
     let start, end;
     if (process.env.NODE_ENV == "development") {
       start = 0;
-      end = Math.min(5, PDFs.length);
+      end = Math.min(start+5, PDFs.length);
     } else if (process.env.NODE_ENV == "production") {
       start = 0;
       end = PDFs.length
@@ -140,15 +140,15 @@ module.exports = {
     
     for (let i = 0; i < end; i++) {
       var PDF = PDFs[i].link;
-      console.log(`Scraping ${PDFs[i].link}`)
-      var file = fs.createWriteStream(`timetables/${PDF}`);
-      await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, async function(response) {
-        let stream = await response.pipe(file);
-        stream.on('finish', function() {
-          callback(PDF);
-        })
-      });
-      await sleep(60000);
-    }
+        console.log(`Scraping ${PDFs[i].link}`)
+        var file = fs.createWriteStream(`timetables/${PDF}`);
+        await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, async function(response) {
+          let stream = await response.pipe(file);
+          stream.on('finish', function() {
+            callback(PDF);
+          })
+        });
+        await sleep(60000);
+      }
   }
 }
