@@ -37,33 +37,30 @@ function removeWhitespace(str) {
 
 async function test() {
   // initialize the database
-  await db.init();
+  //await db.init();
   // get the schema
-  await scrape.all();
+  //await scrape.all();
 
   // get and parse all timetables
-  await scrape.pdf(async function(file) {
-    const data = {
-      modules: await db.getModules(),
-      staff: await db.getStaff(),
-      groups: await db.getGroups(),
-      rooms: await db.getRooms()
-    }
-  
-    console.log(`Parsing ${file}`);
+  //await scrape.pdf(async function(file) {
+  //  const data = {
+  //    modules: await db.getModules(),
+  //    staff: await db.getStaff(),
+  //    groups: await db.getGroups(),
+  //    rooms: await db.getRooms()
+  //}
 
-    // converts pdf into text
-    const txt = await pdf2txt.transform(file);
+  //console.log(`Parsing ${file}`);
 
-    // uses the data schema to figure out whats going on in the text
-    await pair(txt, data);
-  });
+  // converts pdf into text
+  //const txt = await pdf2txt.transform(file);
 
-  
-
+  // uses the data schema to figure out whats going on in the text
+  //await pair(txt, data);
+  //});
 }
 
-test();
+//test();
 
 function contains(target, pattern) {
   // Checks if any pattern element is in target
@@ -283,7 +280,7 @@ router.get("/staff", async (req, res, next) => {
 });
 
 router.get("/groups", async (req, res, next) => {
-  const groups = await db.getGroups({select: "id, identifier"});
+  const groups = await db.getGroups({select: "id, identifier, name"});
   res.json(groups);
 });
 
