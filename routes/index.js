@@ -54,9 +54,9 @@ async function test() {
 
   // converts pdf into text
   const txt = await pdf2txt.transform(file);
-  fs.writeFile(`txts/${file}.txt`, txt, (err) => {
-    if (err) console.log(err);
-  });
+  // fs.writeFile(`txts/${file}.txt`, txt, (err) => {
+  //   if (err) console.log(err);
+  // });
 
   // uses the data schema to figure out whats going on in the text
   await pair(txt, data);
