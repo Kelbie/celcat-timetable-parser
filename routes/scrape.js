@@ -1,5 +1,6 @@
 const http = require('http');
-var request = require("request-promise");
+var request = require("request");
+var rp = require("request-promise");
 var async = require("async");
 var cheerio = require("cheerio");
 var fs = require("fs");
@@ -115,7 +116,7 @@ async function download() {
   
   
 
-  return await request(options);
+  return await rp(options);
 }
 
 async function sleep(millis) {
@@ -139,16 +140,13 @@ module.exports = {
     }
     
     for (let i = 0; i < end; i++) {
-      var PDF = PDFs[i].link;
-        console.log(`Scraping ${PDFs[i].link}`)
+        var PDF = PDFs[i].link;
+        console.log(`Scraping ${PDF}`)
         var file = fs.createWriteStream(`timetables/${PDF}`);
-        await http.get(`http://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/${PDF}`, async function(response) {
-          let stream = await response.pipe(file);
-          stream.on('finish', function() {
-            callback(PDF);
-          })
-        });
-        await sleep(60000);
+        await request.get(`https://celcat.rgu.ac.uk/RGU_MAIN_TIMETABLE/19_20/${PDF}`).pipe(file);
+        await sleep(30000);
+        callback(PDF);
+        await sleep(30000);
       }
   }
 }
