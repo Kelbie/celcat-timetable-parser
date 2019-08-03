@@ -34,7 +34,8 @@ async function download() {
           var link = td.children[0].children[0].parent.attribs.href;
           const text = td.children[0].children[0].data;
           if (text.substring(0,5) == "Group") {
-            const [name, identifier] = text.split("Group:  ")[1].split(",");
+            // Regex matches every character except commas inside parenthesis, this is so we can effectively split the by comma without splitting the commas inside parenthesis            
+            const [identifier, name] = text.split("Group:  ")[1].match(/(([\w-:&â€“/ ](?:\([\w-:&,/ ]+\))?)+)/g);
             group = {
               name: name,
               identifier: identifier,
