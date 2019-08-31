@@ -72,8 +72,8 @@ async function init() {
       id SERIAL,
       raw VARCHAR,
       module_id INT,
-      start BIGINT,
-      finish BIGINT,
+      start timestamp,
+      finish timestamp,
       type VARCHAR,
       PRIMARY KEY (id),
       UNIQUE (start, module_id)
@@ -190,7 +190,7 @@ async function addClass(args) {
   var class_ = await client.query(`
       INSERT INTO class (
         raw, module_id, start, finish, type
-      ) VALUES ($1, $2, $3, $4, $5)
+      ) VALUES ($1, $2, to_timestamp($3), to_timestamp($4), $5)
       ON CONFLICT (module_id, start) DO NOTHING
         RETURNING id;
     `, [args.raw, args.module_id, args.start, args.finish, args.type]);
@@ -212,20 +212,26 @@ async function addClass(args) {
   }
 }
 
-async function getClassesByX(table, id, id_value) {
-
+async function getClassesByX(table, id, id_value, date) {
+  console.log(date);
   if (table == null) {
     var classes = await client.query(`
       SELECT id, start, finish, module_id, type FROM class
-    `);
+        WHERE start::date = date '${date}';
+    `, []);
   } else {
     var classes = await client.query(`
       SELECT id, start, finish, module_id, type FROM class
         WHERE id = ANY(
           SELECT class_id FROM class_${table}
             WHERE ${id}=$1
-        )
+        ) AND start::date = date '${date}'
     `, [id_value]);
+    console.log(`SELECT id, start, finish, module_id, type FROM class
+    WHERE id = ANY(
+      SELECT class_id FROM class_${table}
+        WHERE ${id}=$1
+    ) AND start::date = date '${date}'`);
 
     var link = await client.query(`
       SELECT link FROM ${table}
@@ -301,19 +307,19 @@ async function getClassesByX(table, id, id_value) {
 }
 
 async function getClasses() {
-  return await getClassesByX(null, null, null);
+  return await getClassesByX(null, null, null, null);
 }
 
-async function getClassesByGroup(group_id) {
-  return await getClassesByX("groups", "group_id", group_id)
+async function getClassesByGroup(group_id, date) {
+  return await getClassesByX("groups", "group_id", group_id, date)
 }
 
-async function getClassesByRoom(room_id) {
-  return await getClassesByX("rooms", "room_id", room_id)
+async function getClassesByRoom(room_id, date) {
+  return await getClassesByX("rooms", "room_id", room_id, date)
 }
 
-async function getClassesByStaff(staff_id) {
-  return await getClassesByX("staff", "staff_id", staff_id)
+async function getClassesByStaff(staff_id, date) {
+  return await getClassesByX("staff", "staff_id", staff_id, date)
 }
 
 async function getGroups(options) {
