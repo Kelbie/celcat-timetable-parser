@@ -4,6 +4,69 @@ var async = require("async");
 var fs = require("fs");
 var router = express.Router();
 
+var { GraphQLServer } = require('graphql-yoga');
+
+
+const typeDefs = `
+  type Room {
+    id: Int,
+    identifier: String,
+    name: String,
+    building: String,
+    classes: [Class]
+  }
+
+  type Group {
+    id: Int,
+    identifier: String,
+    name: String,
+    classes: [Class]
+  }
+
+  type Staff {
+    id:	Int
+    first: String,
+    last: String,
+    tag: String,
+    classes: [Class]
+  }
+
+  type Module {
+    id: Int,
+    identifier: String,
+    name: String,
+    classes: Class
+  }
+
+  type Class {
+    id: Int,
+    start: String,
+    finish: String,
+    type: String,
+    rooms: [Room],
+    groups: [Group],
+    staff: [Staff],
+    module: Module,
+  }
+
+  type Query {
+    group(id: Int, date: String): Group
+  }
+`
+
+const resolvers = {
+  Query: {
+    group: async (_, { id, date }) => {
+      let group_response = await db.getGroups({where: `id=${id}`, select: "id, identifier, name"});
+      let classes_response = await db.getClassesByGroup(id, date);
+      return { ...group_response[0], classes: classes_response.classes };
+    }
+  },
+}
+
+const server = new GraphQLServer({ typeDefs, resolvers })
+server.start(() => console.log('Server is running on localhost:4000'))
+
 const types_min = {
   "Event- Board": "Board",
   "Event- External": "External",
@@ -135,6 +198,7 @@ async function pair(txt, data) {
   var group_by_day = { classes: [] };
   for (let i = 0; i < txt_list.length; i++) {
     const element = txt_list[i];
+    
     if (contains(removeWhitespace(element), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
       if (contains(removeWhitespace(class_object.raw), Object.keys(types_min).map(type => { return removeWhitespace(type) } ) )) {
         class_object = raw2dict(class_object, data);
@@ -185,6 +249,7 @@ async function pair(txt, data) {
         time = time.replace(/^\s+|\s+$/g, "");
         var [start, end] = time.split("-");
         
+        // console.log(class_)
         if (class_.module != undefined) {
           // console.log(k, date, new Date(date[2], date[1]-1, date[0], start.split(":")[0], start.split(":")[1]));
           await db.addClass({
